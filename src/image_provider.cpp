@@ -13,7 +13,7 @@ limitations under the License.
 ==============================================================================*/
 #include "model_settings.h"
 #include "image_provider.h"
-#include "esp_log.h"
+//#include "esp_log.h"
 
 // Define your 96x96 grayscale BMP image as an array
 // This should be the flattened array obtained by processing your BMP file.

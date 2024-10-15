@@ -25,16 +25,6 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#include <esp_heap_caps.h>
-#include <esp_timer.h>
-#include <esp_log.h>
-
-#include "esp32/clk.h"
-#include "esp32-hal-cpu.h"
-
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -62,8 +52,6 @@ static uint8_t *tensor_arena;//[kTensorArenaSize]; // Maybe we should move this 
 // The name of this function is important for Arduino compatibility.
 void setup() {
 
-  // bool setCpuFrequencyMhz(160);
-
   Serial.begin(115200);
   while(!Serial);
 
@@ -88,7 +76,7 @@ void setup() {
     tensor_arena = (uint8_t *) heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
   }
   if (tensor_arena == NULL) {
-    printf("Couldn't allocate memory of %d bytes\n", kTensorArenaSize);
+    TF_LITE_REPORT_ERROR(error_reporter, "Couldn't allocate memory of %d bytes", kTensorArenaSize);
     return;
   }
 
@@ -133,15 +121,6 @@ void setup() {
     TF_LITE_REPORT_ERROR(error_reporter, "Image load failed.");
   }
 
-  TF_LITE_REPORT_ERROR(error_reporter, "\n##################################");
-  TF_LITE_REPORT_ERROR(error_reporter, "ESP32 Information:");
-  TF_LITE_REPORT_ERROR(error_reporter, "Internal Total Heap %d, Internal Used Heap %d, Internal Free Heap %d", ESP.getHeapSize(), ESP.getHeapSize()-ESP.getFreeHeap(), ESP.getFreeHeap());
-  TF_LITE_REPORT_ERROR(error_reporter, "Sketch Size %d, Free Sketch Space %d", ESP.getSketchSize(), ESP.getFreeSketchSpace());
-  TF_LITE_REPORT_ERROR(error_reporter, "SPIRam Total heap %d, SPIRam Free Heap %d", ESP.getPsramSize(), ESP.getFreePsram());
-  TF_LITE_REPORT_ERROR(error_reporter, "Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s", ESP.getChipModel(), ESP.getChipRevision(), esp_clk_cpu_freq(), ESP.getSdkVersion());
-  TF_LITE_REPORT_ERROR(error_reporter, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(), ESP.getFlashChipSpeed());
-  TF_LITE_REPORT_ERROR(error_reporter, "##################################\n");
-
 }
 
 // The name of this function is important for Arduino compatibility.
@@ -175,5 +154,4 @@ void loop() {
   // Respond to detection
   RespondToDetection(error_reporter, person_score_f, no_person_score_f);
   TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
-  vTaskDelay(1); // to avoid watchdog trigger
 }
