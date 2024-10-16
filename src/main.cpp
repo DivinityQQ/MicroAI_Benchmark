@@ -27,6 +27,10 @@ limitations under the License.
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
+
+#define NUM_ITERATIONS 3
+#define START_WITH_PERSON 0
+
 tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
@@ -47,6 +51,10 @@ constexpr int scratchBufSize = 0;
 // An area of memory to use for input, output, and intermediate arrays.
 constexpr int kTensorArenaSize = 81 * 1024 + scratchBufSize;
 static uint8_t *tensor_arena;//[kTensorArenaSize]; // Maybe we should move this to external
+
+int8_t X = NUM_ITERATIONS;  // Change every NUM_ITERATIONS
+int8_t iteration_count = 0;  // Initialize iteration count
+bool person = START_WITH_PERSON;  // Whether to start with image with or without person
 }  // namespace
 
 // The name of this function is important for Arduino compatibility.
@@ -115,16 +123,23 @@ void setup() {
   // Get information about the memory area to use for the model's input.
   input = interpreter->input(0);
 
-  // Get image from provider.
-  if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
-                            input->data.int8)) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Image load failed.");
-  }
-
 }
 
 // The name of this function is important for Arduino compatibility.
 void loop() {
+
+  // Get image from provider.
+  if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
+                            input->data.int8, person)) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Image load failed.");
+  }
+  // Increment the iteration count
+  iteration_count++;
+  // Check if iteration count is divisible by X
+  if (iteration_count % X == 0) {
+  // Toggle the person variable
+    person = !person;  // Changes 0 to 1 and 1 to 0
+  }
 
   // Record time before inference
   unsigned long start_time = millis();
