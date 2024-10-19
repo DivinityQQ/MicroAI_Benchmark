@@ -14,7 +14,7 @@ limitations under the License.
 #include <Arduino.h>
 
 // include main library header file
-#include <Chirale_TensorFlowLite.h>
+// #include <Chirale_TensorFlowLite.h>
 
 #include "detection_responder.h"
 #include "image_provider.h"
@@ -24,6 +24,7 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/micro/micro_profiler.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -62,6 +63,14 @@ void setup() {
 
   Serial.begin(115200);
   while(!Serial);
+
+  #ifdef CONFIG_IDF_TARGET_ESP32C6
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // turn the LED off by making the voltage LOW
+  digitalWrite(LED_BUILTIN, LOW);
+  #endif
 
   // Set up logging. Google style is to avoid globals or statics because of
   // lifetime uncertainty, but since this has a trivial destructor it's okay.
@@ -169,4 +178,7 @@ void loop() {
   // Respond to detection
   RespondToDetection(error_reporter, person_score_f, no_person_score_f);
   TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
+
+  // Use delay to make the loop more distinguishable
+  delay(500);
 }
