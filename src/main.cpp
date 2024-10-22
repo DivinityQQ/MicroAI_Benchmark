@@ -13,8 +13,13 @@ limitations under the License.
 
 #include <Arduino.h>
 
+#ifdef ARCH_ESP32_S3
 // include main library header file
-// #include <Chirale_TensorFlowLite.h>
+#include <ESP_TF.h>
+#else
+// include main library header file
+#include <Chirale_TensorFlowLite.h>
+#endif
 
 #include "detection_responder.h"
 #include "image_provider.h"
@@ -32,6 +37,7 @@ namespace {
 #define NUM_ITERATIONS 3
 #define START_WITH_PERSON 0
 
+tflite::MicroProfiler profiler;
 tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
@@ -115,7 +121,7 @@ void setup() {
   // Build an interpreter to run the model with.
   // NOLINTNEXTLINE(runtime-global-variables)
   static tflite::MicroInterpreter static_interpreter(
-      model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
   interpreter = &static_interpreter;
 
   // Allocate memory from the tensor_arena for the model's tensors.
@@ -150,6 +156,9 @@ void loop() {
     person = !person;  // Changes 0 to 1 and 1 to 0
   }
 
+  // Start profiling the inference event
+  uint32_t event_handle = profiler.BeginEvent("Invoke");
+
   // Record time before inference
   unsigned long start_time = millis();
 
@@ -160,6 +169,14 @@ void loop() {
 
   // Record time after inference
   unsigned long end_time = millis();
+
+  // End profiling for this event
+  profiler.EndEvent(event_handle);
+
+  // Log the profiling data
+  profiler.Log();
+
+  profiler.ClearEvents();
 
   // Calculate inference time
   unsigned long inference_time = end_time - start_time;
