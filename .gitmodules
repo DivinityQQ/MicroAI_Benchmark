@@ -1,0 +1,6 @@
+[submodule "lib/TensorFlow_Lite_CMSIS_NN"]
+	path = lib/TensorFlow_Lite_CMSIS_NN
+	url = https://github.com/DivinityQQ/TensorFlow_Lite_CMSIS_NN
+[submodule "lib/TensorFlow_Lite_ESP_NN"]
+	path = lib/TensorFlow_Lite_ESP_NN
+	url = https://github.com/DivinityQQ/TensorFlow_Lite_ESP_NN
