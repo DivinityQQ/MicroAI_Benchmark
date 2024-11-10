@@ -13,7 +13,7 @@ limitations under the License.
 
 #include <Arduino.h>
 
-#ifdef ARCH_ESP32_S3
+#ifdef CONFIG_IDF_TARGET_ESP32S3
 // include main library header file
 #include <ESP_TF.h>
 #else
@@ -36,6 +36,10 @@ namespace {
 
 #define NUM_ITERATIONS 3
 #define START_WITH_PERSON 0
+
+// Whether or not to log inference time data,
+// for measuring power consumption, setting this to 0 is recommended
+#define ENABLE_LOGGING 1
 
 tflite::MicroProfiler profiler;
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -67,8 +71,12 @@ bool person = START_WITH_PERSON;  // Whether to start with image with or without
 // The name of this function is important for Arduino compatibility.
 void setup() {
 
-  Serial.begin(115200);
-  while(!Serial);
+  // Enable serial only when logging is enabled and you intend to connect the kit to PC,
+  // on some boards it might hang otherwise
+  if (ENABLE_LOGGING == true) {
+    Serial.begin(115200);
+    while(!Serial);
+  }
 
   #ifdef CONFIG_IDF_TARGET_ESP32C6
   // initialize digital pin LED_BUILTIN as an output.
@@ -76,6 +84,14 @@ void setup() {
 
   // turn the LED off by making the voltage LOW
   digitalWrite(LED_BUILTIN, LOW);
+  #endif
+
+  #ifdef ARDUINO_RASPBERRY_PI_PICO_W
+  // digitalWrite(PIN_LED, HIGH);
+
+  // Put the SMPS into PWM mode for better power consumption readibility
+  // at the cost of higher idle power consumption
+  digitalWrite(32+1, HIGH);
   #endif
 
   // Set up logging. Google style is to avoid globals or statics because of
@@ -156,30 +172,44 @@ void loop() {
     person = !person;  // Changes 0 to 1 and 1 to 0
   }
 
-  // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Invoke");
+  // Code path when logging is enabled, affects power consumption
+  if (ENABLE_LOGGING == true) {
+    // Start profiling the inference event
+    uint32_t event_handle = profiler.BeginEvent("Invoke");
 
-  // Record time before inference
-  unsigned long start_time = millis();
+    // Record time before inference
+    unsigned long start_time = millis();
 
-  // Run the model on this input and make sure it succeeds.
-  if (kTfLiteOk != interpreter->Invoke()) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+    // Run the model on this input and make sure it succeeds.
+    if (kTfLiteOk != interpreter->Invoke()) {
+      TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+    }
+
+    // Record time after inference
+    unsigned long end_time = millis();
+
+    // End profiling for this event
+    profiler.EndEvent(event_handle);
+
+    // Log the profiling data
+    profiler.Log();
+
+    profiler.ClearEvents();
+
+    // Calculate inference time
+    unsigned long inference_time = end_time - start_time;
+
+    TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
   }
 
-  // Record time after inference
-  unsigned long end_time = millis();
-
-  // End profiling for this event
-  profiler.EndEvent(event_handle);
-
-  // Log the profiling data
-  profiler.Log();
-
-  profiler.ClearEvents();
-
-  // Calculate inference time
-  unsigned long inference_time = end_time - start_time;
+  // Code path with no logging
+  else {
+    // Run the model on this input and make sure it succeeds.
+    if (kTfLiteOk != interpreter->Invoke()) {
+      TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+    }
+  }
+  
 
   TfLiteTensor* output = interpreter->output(0);
 
@@ -194,7 +224,6 @@ void loop() {
 
   // Respond to detection
   RespondToDetection(error_reporter, person_score_f, no_person_score_f);
-  TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
 
   // Use delay to make the loop more distinguishable
   delay(500);
