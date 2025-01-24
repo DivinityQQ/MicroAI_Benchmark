@@ -39,7 +39,7 @@ namespace {
 
 // Whether or not to log inference time data,
 // for measuring power consumption, setting this to 0 is recommended
-#define ENABLE_LOGGING 1
+#define ENABLE_LOGGING 0
 
 tflite::MicroProfiler profiler;
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -164,6 +164,7 @@ void loop() {
                             input->data.int8, person)) {
     TF_LITE_REPORT_ERROR(error_reporter, "Image load failed.");
   }
+
   // Increment the iteration count
   iteration_count++;
   // Check if iteration count is divisible by X
