@@ -18,7 +18,7 @@ limitations under the License.
 #include <ESP_TF.h>
 #else
 // include main library header file
-#include <Chirale_TensorFlowLite.h>
+#include <TensorFlowLite.h>
 #endif
 
 #include "detection_responder.h"
@@ -39,7 +39,7 @@ namespace {
 
 // Whether or not to log inference time data,
 // for measuring power consumption, setting this to 0 is recommended
-#define ENABLE_LOGGING 0
+#define ENABLE_LOGGING 1
 
 tflite::MicroProfiler profiler;
 tflite::ErrorReporter* error_reporter = nullptr;
