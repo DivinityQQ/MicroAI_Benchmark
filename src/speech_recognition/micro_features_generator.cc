@@ -33,7 +33,7 @@ const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
 
 constexpr size_t kArenaSize = 16 * 1024;
-alignas(16) uint8_t g_arena[kArenaSize];
+alignas(16) uint8_t *g_arena;//[kArenaSize];
 
 constexpr int kAudioSampleDurationCount =
     kFeatureDurationMs * kAudioSampleFrequency / 1000;
@@ -76,6 +76,13 @@ TfLiteStatus InitializeMicroFeatures() {
                          "to supported version %d.",
                          model->version(), TFLITE_SCHEMA_VERSION);
     return kTfLiteError;
+  }
+
+  if (g_arena == NULL) {
+    g_arena = (uint8_t *) malloc(kArenaSize);
+  }
+  if (g_arena == NULL) {
+    TF_LITE_REPORT_ERROR(nullptr, "Couldn't allocate memory of %d bytes", kArenaSize);
   }
 
   static AudioPreprocessorOpResolver op_resolver;

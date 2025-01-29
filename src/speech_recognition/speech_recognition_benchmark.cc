@@ -31,9 +31,15 @@ limitations under the License.
 #include "tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
+#ifdef ENABLE_PROFILING
+#include "tensorflow/lite/micro/micro_profiler.h"
+#endif
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
+#ifdef ENABLE_PROFILING
+tflite::MicroProfiler profiler;
+#endif
 const tflite::Model* model = nullptr;
 tflite::ErrorReporter* error_reporter = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
@@ -44,7 +50,7 @@ FeatureProvider* feature_provider = nullptr;
 // The size of this will depend on the model you're using, and may need to be
 // determined by experimentation.
 constexpr int kTensorArenaSize = 30 * 1024;
-uint8_t tensor_arena[kTensorArenaSize];
+alignas(16) uint8_t *tensor_arena;//[kTensorArenaSize];
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
 }  // namespace
@@ -52,8 +58,12 @@ int8_t* model_input_buffer = nullptr;
 // The name of this function is important for Arduino compatibility.
 void speech_recognition_setup() {
 
+  // Enable serial only when profiling is enabled and you intend to connect the kit to PC,
+  // on some boards it might hang otherwise
+  #if defined(ENABLE_PROFILING) || defined(ENABLE_LOGGING)
   Serial.begin(115200);
   while(!Serial);
+  #endif
 
   // Set up logging. Google style is to avoid globals or statics because of
   // lifetime uncertainty, but since this has a trivial destructor it's okay.
@@ -69,6 +79,14 @@ void speech_recognition_setup() {
                          "Model provided is schema version %d not equal "
                          "to supported version %d.",
                          model->version(), TFLITE_SCHEMA_VERSION);
+    return;
+  }
+
+  if (tensor_arena == NULL) {
+    tensor_arena = (uint8_t *) malloc(kTensorArenaSize);
+  }
+  if (tensor_arena == NULL) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Couldn't allocate memory of %d bytes", kTensorArenaSize);
     return;
   }
 
@@ -95,8 +113,14 @@ void speech_recognition_setup() {
   }
 
   // Build an interpreter to run the model with.
+  // NOLINTNEXTLINE(runtime-global-variables)
+  #ifdef ENABLE_PROFILING
+  static tflite::MicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
+  #else
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+  #endif
   interpreter = &static_interpreter;
 
   // Allocate memory from the tensor_arena for the model's tensors.
@@ -131,6 +155,12 @@ void speech_recognition_loop() {
   // Fetch the spectrogram for the current time.
   const int32_t dummy_time = 0;
   int how_many_new_slices = 0;
+
+  #ifdef ENABLE_LOGGING
+  // Record time before inference
+  unsigned long start_time_spectrogram = millis();
+  #endif
+
   TfLiteStatus feature_status = feature_provider->PopulateFeatureData(
       dummy_time, dummy_time, &how_many_new_slices);
   if (feature_status != kTfLiteOk) {
@@ -138,10 +168,30 @@ void speech_recognition_loop() {
     return;
   }
 
+  #ifdef ENABLE_LOGGING
+  // Record time after inference
+  unsigned long end_time_spectrogram = millis();
+
+  // Calculate inference time
+  unsigned long inference_time_spectrogram = end_time_spectrogram - start_time_spectrogram;
+
+  TF_LITE_REPORT_ERROR(error_reporter, "Spectrogram inference time (ms): %d", inference_time_spectrogram);
+  #endif
+
   // Copy feature buffer to input tensor
   for (int i = 0; i < kFeatureElementCount; i++) {
     model_input_buffer[i] = feature_buffer[i];
   }
+
+  #ifdef ENABLE_PROFILING
+  // Start profiling the inference event
+  uint32_t event_handle = profiler.BeginEvent("Invoke");
+  #endif
+
+  #ifdef ENABLE_LOGGING
+  // Record time before inference
+  unsigned long start_time_recognition = millis();
+  #endif
 
   // Run the model on the spectrogram input and make sure it succeeds.
   TfLiteStatus invoke_status = interpreter->Invoke();
@@ -149,6 +199,27 @@ void speech_recognition_loop() {
     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed");
     return;
   }
+
+  #ifdef ENABLE_LOGGING
+  // Record time after inference
+  unsigned long end_time_recognition = millis();
+  #endif
+
+  #ifdef ENABLE_PROFILING
+  // End profiling for this event
+  profiler.EndEvent(event_handle);
+
+  // Log the profiling data
+  profiler.Log();
+
+  profiler.ClearEvents();
+  #endif
+
+  #ifdef ENABLE_LOGGING
+  // Calculate inference time
+  unsigned long inference_time_recognition = end_time_recognition - start_time_recognition;
+
+  TF_LITE_REPORT_ERROR(error_reporter, "Recognition inference time (ms): %d", inference_time_recognition);
 
   // Obtain a pointer to the output tensor
   TfLiteTensor* output = interpreter->output(0);
@@ -174,6 +245,9 @@ void speech_recognition_loop() {
   } else {
     TF_LITE_REPORT_ERROR(error_reporter, "No detection");
   }
+  #endif
+
+  delay(500);
 }
 
 #endif // USE_SPEECH_MODEL

@@ -32,19 +32,15 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
+#endif
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
-
-#define NUM_ITERATIONS 3
-#define START_WITH_PERSON 0
-
-// Whether or not to log inference time data,
-// for measuring power consumption, setting this to 0 is recommended
-#define ENABLE_LOGGING 1
-
+#ifdef ENABLE_PROFILING
 tflite::MicroProfiler profiler;
+#endif
 tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
@@ -74,12 +70,12 @@ bool person = START_WITH_PERSON;  // Whether to start with image with or without
 // The name of this function is important for Arduino compatibility.
 void image_recognition_setup() {
 
-  // Enable serial only when logging is enabled and you intend to connect the kit to PC,
+  // Enable serial only when profiling is enabled and you intend to connect the kit to PC,
   // on some boards it might hang otherwise
-  if (ENABLE_LOGGING == true) {
-    Serial.begin(115200);
-    while(!Serial);
-  }
+  #if defined(ENABLE_PROFILING) || defined(ENABLE_LOGGING)
+  Serial.begin(115200);
+  while(!Serial);
+  #endif
 
   #ifdef CONFIG_IDF_TARGET_ESP32C6
   // initialize digital pin LED_BUILTIN as an output.
@@ -139,8 +135,13 @@ void image_recognition_setup() {
 
   // Build an interpreter to run the model with.
   // NOLINTNEXTLINE(runtime-global-variables)
+  #ifdef ENABLE_PROFILING
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
+  #else
+  static tflite::MicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+  #endif
   interpreter = &static_interpreter;
 
   // Allocate memory from the tensor_arena for the model's tensors.
@@ -151,8 +152,8 @@ void image_recognition_setup() {
   }
 
   // Report the actual memory usage
-  size_t used_bytes = interpreter->arena_used_bytes();
-  TF_LITE_REPORT_ERROR(error_reporter, "Tensor Arena Used: %d bytes", used_bytes);
+  // size_t used_bytes = interpreter->arena_used_bytes();
+  // TF_LITE_REPORT_ERROR(error_reporter, "Tensor Arena Used: %d bytes", used_bytes);
 
   // Get information about the memory area to use for the model's input.
   input = interpreter->input(0);
@@ -176,44 +177,42 @@ void image_recognition_loop() {
     person = !person;  // Changes 0 to 1 and 1 to 0
   }
 
+  #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
-  if (ENABLE_LOGGING == true) {
-    // Start profiling the inference event
-    uint32_t event_handle = profiler.BeginEvent("Invoke");
+  // Start profiling the inference event
+  uint32_t event_handle = profiler.BeginEvent("Invoke");
+  #endif
 
-    // Record time before inference
-    unsigned long start_time = millis();
+  #ifdef ENABLE_LOGGING
+  // Record time before inference
+  unsigned long start_time = millis();
+  #endif
 
-    // Run the model on this input and make sure it succeeds.
-    if (kTfLiteOk != interpreter->Invoke()) {
-      TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
-    }
-
-    // Record time after inference
-    unsigned long end_time = millis();
-
-    // End profiling for this event
-    profiler.EndEvent(event_handle);
-
-    // Log the profiling data
-    profiler.Log();
-
-    profiler.ClearEvents();
-
-    // Calculate inference time
-    unsigned long inference_time = end_time - start_time;
-
-    TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
+  // Run the model on this input and make sure it succeeds.
+  if (kTfLiteOk != interpreter->Invoke()) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
   }
 
-  // Code path with no logging
-  else {
-    // Run the model on this input and make sure it succeeds.
-    if (kTfLiteOk != interpreter->Invoke()) {
-      TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
-    }
-  }
-  
+  #ifdef ENABLE_LOGGING
+  // Record time after inference
+  unsigned long end_time = millis();
+  #endif
+
+  #ifdef ENABLE_PROFILING
+  // End profiling for this event
+  profiler.EndEvent(event_handle);
+
+  // Log the profiling data
+  profiler.Log();
+
+  profiler.ClearEvents();
+  #endif
+
+  #ifdef ENABLE_LOGGING
+  // Calculate inference time
+  unsigned long inference_time = end_time - start_time;
+
+  TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
 
   TfLiteTensor* output = interpreter->output(0);
 
@@ -228,6 +227,7 @@ void image_recognition_loop() {
 
   // Respond to detection
   RespondToDetection(error_reporter, person_score_f, no_person_score_f);
+  #endif
 
   // Use delay to make the loop more distinguishable
   delay(500);
