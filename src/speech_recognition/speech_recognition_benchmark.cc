@@ -50,7 +50,7 @@ FeatureProvider* feature_provider = nullptr;
 // The size of this will depend on the model you're using, and may need to be
 // determined by experimentation.
 constexpr int kTensorArenaSize = 30 * 1024;
-alignas(16) uint8_t *tensor_arena;//[kTensorArenaSize];
+alignas(16) uint8_t tensor_arena[kTensorArenaSize];
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
 }  // namespace
@@ -79,14 +79,6 @@ void speech_recognition_setup() {
                          "Model provided is schema version %d not equal "
                          "to supported version %d.",
                          model->version(), TFLITE_SCHEMA_VERSION);
-    return;
-  }
-
-  if (tensor_arena == NULL) {
-    tensor_arena = (uint8_t *) malloc(kTensorArenaSize);
-  }
-  if (tensor_arena == NULL) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Couldn't allocate memory of %d bytes", kTensorArenaSize);
     return;
   }
 

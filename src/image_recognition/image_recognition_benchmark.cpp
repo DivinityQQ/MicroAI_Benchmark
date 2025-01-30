@@ -60,7 +60,7 @@ constexpr int scratchBufSize = 0;
 #endif
 // An area of memory to use for input, output, and intermediate arrays.
 constexpr int kTensorArenaSize = 81 * 1024 + scratchBufSize;
-alignas(8) uint8_t *tensor_arena;//[kTensorArenaSize]; // Maybe we should move this to external
+alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 
 int8_t X = NUM_ITERATIONS;  // Change every NUM_ITERATIONS
 int8_t iteration_count = 0;  // Initialize iteration count
@@ -107,14 +107,6 @@ void image_recognition_setup() {
                          "Model provided is schema version %d not equal "
                          "to supported version %d.",
                          model->version(), TFLITE_SCHEMA_VERSION);
-    return;
-  }
-
-  if (tensor_arena == NULL) {
-    tensor_arena = (uint8_t *) malloc(kTensorArenaSize);
-  }
-  if (tensor_arena == NULL) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Couldn't allocate memory of %d bytes", kTensorArenaSize);
     return;
   }
 
