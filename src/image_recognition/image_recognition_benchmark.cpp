@@ -18,10 +18,10 @@ limitations under the License.
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
 // include main library header file
-#include <ESP_TF.h>
+#include <TensorFlow_Lite_ESP_NN.h>
 #else
 // include main library header file
-#include <TensorFlowLite.h>
+#include <TensorFlow_Lite_CMSIS_NN.h>
 #endif
 
 #include "detection_responder.h"
