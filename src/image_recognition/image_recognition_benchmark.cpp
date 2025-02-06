@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <Arduino.h>
 
-#ifdef CONFIG_IDF_TARGET_ESP32S3
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
 // include main library header file
 #include <ESP_TF.h>
 #else
@@ -53,8 +53,8 @@ TfLiteTensor* input = nullptr;
 // signed 8-bit integers is to subtract 128 from the unsigned value to get a
 // signed value.
 
-#ifdef CONFIG_IDF_TARGET_ESP32S3
-constexpr int scratchBufSize = 39 * 1024;
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
+constexpr int scratchBufSize = 60 * 1024;
 #else
 constexpr int scratchBufSize = 0;
 #endif

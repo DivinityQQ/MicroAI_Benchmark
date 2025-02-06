@@ -14,5 +14,5 @@
 
 //Image recognition benchmark configuration
 
-#define NUM_ITERATIONS 3
+#define NUM_ITERATIONS 1
 #define START_WITH_PERSON 0
