@@ -195,7 +195,7 @@ void image_recognition_loop() {
   profiler.EndEvent(event_handle);
 
   // Log the profiling data
-  profiler.Log();
+  profiler.LogTicksPerTag();
 
   profiler.ClearEvents();
   #endif

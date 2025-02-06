@@ -18,6 +18,14 @@ limitations under the License.
 
 #include <Arduino.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
+// include main library header file
+#include <TensorFlow_Lite_ESP_NN.h>
+#else
+// include main library header file
+#include <TensorFlow_Lite_CMSIS_NN.h>
+#endif
+
 #include <algorithm>
 #include <cstdint>
 #include <iterator>
@@ -177,7 +185,7 @@ void speech_recognition_loop() {
 
   #ifdef ENABLE_PROFILING
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Invoke");
+  uint32_t event_handle = profiler.BeginEvent("Recognition invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -202,7 +210,7 @@ void speech_recognition_loop() {
   profiler.EndEvent(event_handle);
 
   // Log the profiling data
-  profiler.Log();
+  profiler.LogTicksPerTag();
 
   profiler.ClearEvents();
   #endif

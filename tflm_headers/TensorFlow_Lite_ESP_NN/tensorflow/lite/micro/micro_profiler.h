@@ -60,10 +60,10 @@ class MicroProfiler : public MicroProfilerInterface {
   // Separated Value) form.
   void LogCsv() const;
 
-  // Prints  total ticks for each unique tag in CSV format.
+  // Prints  total ticks for each unique tag.
   // Output will have one row for each unique tag along with the
   // total ticks summed across all events with that particular tag.
-  void LogTicksPerTagCsv();
+  void LogTicksPerTag();
 
  private:
   // Maximum number of events that this class can keep track of. The
