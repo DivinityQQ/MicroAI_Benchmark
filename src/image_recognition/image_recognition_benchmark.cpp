@@ -172,7 +172,7 @@ void image_recognition_loop() {
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Invoke");
+  uint32_t event_handle = profiler.BeginEvent("Image recognition invoke");
   #endif
 
   #ifdef ENABLE_LOGGING

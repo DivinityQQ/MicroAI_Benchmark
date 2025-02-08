@@ -9,8 +9,8 @@
 
 // Whether or not to log inference time data,
 // for measuring power consumption, not defining this is recommended
-// #define ENABLE_PROFILING
-#define ENABLE_LOGGING
+#define ENABLE_PROFILING
+// #define ENABLE_LOGGING
 
 //Image recognition benchmark configuration
 

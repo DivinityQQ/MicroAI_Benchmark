@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include "config.h"
+
 #include "micro_features_generator.h"
 
 #include <cmath>
@@ -23,13 +25,21 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "micro_model_settings.h"
+#ifdef ENABLE_PROFILING
+#include "tensorflow/lite/micro/micro_profiler.h"
+#endif
 
 namespace {
+
+#ifdef ENABLE_PROFILING
+tflite::MicroProfiler spectrogram_profiler;
+#endif
 
 // FrontendState g_micro_features_state;
 bool g_is_first_time = true;
 
 const tflite::Model* model = nullptr;
+tflite::ErrorReporter* error_reporter = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
 
 constexpr size_t kArenaSize = 16 * 1024;
@@ -67,11 +77,17 @@ TfLiteStatus RegisterOps(AudioPreprocessorOpResolver& op_resolver) {
 TfLiteStatus InitializeMicroFeatures() {
   g_is_first_time = true;
 
+  // Set up logging. Google style is to avoid globals or statics because of
+  // lifetime uncertainty, but since this has a trivial destructor it's okay.
+  // NOLINTNEXTLINE(runtime-global-variables)
+  static tflite::MicroErrorReporter micro_error_reporter;
+  error_reporter = &micro_error_reporter;
+
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
   model = tflite::GetModel(g_audio_preprocessor_int8_tflite);
   if (model->version() != TFLITE_SCHEMA_VERSION) {
-    TF_LITE_REPORT_ERROR(nullptr,
+    TF_LITE_REPORT_ERROR(error_reporter,
                          "Model provided is schema version %d not equal "
                          "to supported version %d.",
                          model->version(), TFLITE_SCHEMA_VERSION);
@@ -81,11 +97,17 @@ TfLiteStatus InitializeMicroFeatures() {
   static AudioPreprocessorOpResolver op_resolver;
   RegisterOps(op_resolver);
 
-  static tflite::MicroInterpreter static_interpreter(model, op_resolver, g_arena, kArenaSize);
+  #ifdef ENABLE_PROFILING
+  static tflite::MicroInterpreter static_interpreter(
+      model, op_resolver, g_arena, kArenaSize, nullptr, &spectrogram_profiler);
+  #else
+  static tflite::MicroInterpreter static_interpreter(
+      model, op_resolver, g_arena, kArenaSize);
+  #endif
   interpreter = &static_interpreter;
 
   if (interpreter->AllocateTensors() != kTfLiteOk) {
-    TF_LITE_REPORT_ERROR(nullptr, "AllocateTensors failed for Feature provider model. Line %d", __LINE__);
+    TF_LITE_REPORT_ERROR(error_reporter, "AllocateTensors failed for Feature provider model. Line %d", __LINE__);
     return kTfLiteError;
   }
 
@@ -104,7 +126,7 @@ TfLiteStatus GenerateSingleFeature(const int16_t* audio_data,
   std::copy_n(audio_data, audio_data_size,
               tflite::GetTensorData<int16_t>(input));
   if (interpreter->Invoke() != kTfLiteOk) {
-    TF_LITE_REPORT_ERROR(nullptr, "Feature generator model invocation failed");
+    TF_LITE_REPORT_ERROR(error_reporter, "Feature generator model invocation failed");
   }
 
   std::copy_n(tflite::GetTensorData<int8_t>(output), kFeatureSize,
@@ -118,6 +140,12 @@ TfLiteStatus GenerateFeatures(const int16_t* audio_data,
                               Features* features_output) {
   size_t remaining_samples = audio_data_size;
   size_t feature_index = 0;
+
+  #ifdef ENABLE_PROFILING
+  // Start profiling the inference event
+  uint32_t event_handle = spectrogram_profiler.BeginEvent("Spectrogram builder invoke");
+  #endif
+
   while (remaining_samples >= kAudioSampleDurationCount &&
          feature_index < kFeatureCount) {
     TF_LITE_ENSURE_STATUS(
@@ -127,6 +155,16 @@ TfLiteStatus GenerateFeatures(const int16_t* audio_data,
     audio_data += kAudioSampleStrideCount;
     remaining_samples -= kAudioSampleStrideCount;
   }
+
+  #ifdef ENABLE_PROFILING
+  // End profiling for this event
+  spectrogram_profiler.EndEvent(event_handle);
+
+  // Log the profiling data
+  spectrogram_profiler.LogTicksPerTag();
+
+  spectrogram_profiler.ClearEvents();
+  #endif
 
   return kTfLiteOk;
 }

@@ -175,7 +175,7 @@ void speech_recognition_loop() {
   // Calculate inference time
   unsigned long inference_time_spectrogram = end_time_spectrogram - start_time_spectrogram;
 
-  TF_LITE_REPORT_ERROR(error_reporter, "Spectrogram inference time (ms): %d", inference_time_spectrogram);
+  TF_LITE_REPORT_ERROR(error_reporter, "Spectrogram builder inference time (ms): %d", inference_time_spectrogram);
   #endif
 
   // Copy feature buffer to input tensor
@@ -185,7 +185,7 @@ void speech_recognition_loop() {
 
   #ifdef ENABLE_PROFILING
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Recognition invoke");
+  uint32_t event_handle = profiler.BeginEvent("Speech recognition invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -219,7 +219,7 @@ void speech_recognition_loop() {
   // Calculate inference time
   unsigned long inference_time_recognition = end_time_recognition - start_time_recognition;
 
-  TF_LITE_REPORT_ERROR(error_reporter, "Recognition inference time (ms): %d", inference_time_recognition);
+  TF_LITE_REPORT_ERROR(error_reporter, "Speech ecognition inference time (ms): %d", inference_time_recognition);
 
   // Obtain a pointer to the output tensor
   TfLiteTensor* output = interpreter->output(0);

@@ -33,6 +33,8 @@ extern const uint8_t no_1000ms_start[];
 extern const uint8_t noise_1000ms_start[];
 extern const uint8_t silence_1000ms_start[];
 
+tflite::ErrorReporter* error_reporter = nullptr;
+
 Features g_features;
 
 FeatureProvider::FeatureProvider(int feature_size, int8_t* feature_data)
@@ -49,8 +51,15 @@ FeatureProvider::~FeatureProvider() {}
 
 TfLiteStatus FeatureProvider::PopulateFeatureData(
     int32_t last_time_in_ms, int32_t time_in_ms, int* how_many_new_slices) {
+
+  // Set up logging. Google style is to avoid globals or statics because of
+  // lifetime uncertainty, but since this has a trivial destructor it's okay.
+  // NOLINTNEXTLINE(runtime-global-variables)
+  static tflite::MicroErrorReporter micro_error_reporter;
+  error_reporter = &micro_error_reporter;
+
   if (feature_size_ != kFeatureElementCount) {
-    TF_LITE_REPORT_ERROR(nullptr, "Requested feature_data_ size %d doesn't match %d",
+    TF_LITE_REPORT_ERROR(error_reporter, "Requested feature_data_ size %d doesn't match %d",
                feature_size_, kFeatureElementCount);
     return kTfLiteError;
   }
