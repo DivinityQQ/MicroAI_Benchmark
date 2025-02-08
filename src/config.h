@@ -5,7 +5,8 @@
  *********************************************/
 
 // Uncomment ONE model to use
-#define USE_IMAGE_MODEL
+// #define USE_IMAGE_MODEL
+#define USE_KEYWORD_MODEL
 // #define USE_SPEECH_MODEL
 
 /*********************************************
@@ -15,7 +16,7 @@
 // Whether or not to log and/or profile inference time data
 // For measuring power consumption, not defining this is recommended
 #define ENABLE_PROFILING
-// #define ENABLE_LOGGING
+#define ENABLE_LOGGING
 
 /*********************************************
  *   IMAGE RECOGNITION BENCHMARK SETTINGS
