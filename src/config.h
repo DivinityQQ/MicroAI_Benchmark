@@ -1,18 +1,31 @@
 #pragma once
 
-// Uncomment ONE model to use
+/*********************************************
+ *               BENCHMARK SELECTION
+ *********************************************/
 
+// Uncomment ONE model to use
 #define USE_IMAGE_MODEL
 // #define USE_SPEECH_MODEL
 
-// Common configuration
+/*********************************************
+ *          COMMON CONFIGURATION
+ *********************************************/
 
-// Whether or not to log inference time data,
-// for measuring power consumption, not defining this is recommended
+// Whether or not to log and/or profile inference time data
+// For measuring power consumption, not defining this is recommended
 #define ENABLE_PROFILING
 // #define ENABLE_LOGGING
 
-//Image recognition benchmark configuration
+/*********************************************
+ *   IMAGE RECOGNITION BENCHMARK SETTINGS
+ *********************************************/
 
 #define NUM_ITERATIONS 1
 #define START_WITH_PERSON 0
+
+/*********************************************
+ *  SPEECH RECOGNITION BENCHMARK SETTINGS
+ *********************************************/
+
+// (Add relevant configuration settings here)
