@@ -12,7 +12,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "config.h"
-#ifdef USE_IMAGE_MODEL
+#ifdef USE_IMAGE_BENCHMARK
 
 #include <Arduino.h>
 
@@ -225,4 +225,4 @@ void image_recognition_loop() {
   delay(500);
 }
 
-#endif // USE_IMAGE_MODEL
+#endif // USE_IMAGE_BENCHMARK

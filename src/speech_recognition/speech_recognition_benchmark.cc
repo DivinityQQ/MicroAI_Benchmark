@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "config.h"
-#ifdef USE_SPEECH_MODEL
+#ifdef USE_SPEECH_BENCHMARK
 
 #include <Arduino.h>
 
@@ -250,4 +250,4 @@ void speech_recognition_loop() {
   delay(500);
 }
 
-#endif // USE_SPEECH_MODEL
+#endif // USE_SPEECH_BENCHMARK

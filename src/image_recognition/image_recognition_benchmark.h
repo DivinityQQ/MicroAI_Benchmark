@@ -2,9 +2,9 @@
 #pragma once
 
 #include "config.h"
-#ifdef USE_IMAGE_MODEL
+#ifdef USE_IMAGE_BENCHMARK
 
 void image_recognition_setup();
 void image_recognition_loop();
 
-#endif // USE_IMAGE_MODEL
+#endif // USE_IMAGE_BENCHMARK

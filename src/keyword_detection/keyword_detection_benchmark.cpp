@@ -12,7 +12,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "config.h"
-#ifdef USE_KEYWORD_MODEL
+#ifdef USE_KEYWORD_BENCHMARK
 
 #include <Arduino.h>
 
@@ -27,13 +27,17 @@ limitations under the License.
 // #include "detection_responder.h"
 #include "data_provider.h"
 #include "model_settings.h"
-#include "keyword_scrambled_8bit_model_data.h"
 #include "tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
+#endif
+#ifdef USE_8BIT_MODEL
+#include "keyword_scrambled_8bit_model_data.h"
+#else
+#include "keyword_scrambled_model_data.h"
 #endif
 
 // Globals, used for compatibility with Arduino-style sketches.
@@ -200,4 +204,4 @@ void keyword_detection_loop() {
   delay(500);
 }
 
-#endif // USE_KEYWORD_MODEL
+#endif // USE_KEYWORD_BENCHMARK
