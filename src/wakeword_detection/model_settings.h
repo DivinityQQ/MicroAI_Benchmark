@@ -16,13 +16,21 @@ limitations under the License.
 
 // All of these values are derived from the values used during model training,
 // if you change your model you'll need to update these constants.
-constexpr int kNumCols = 96;
-constexpr int kNumRows = 1;
+
+#include "config.h"
+
+#ifdef USE_128x128x1_MODEL
+constexpr int kNumCols = 128;
+constexpr int kNumRows = 128;
 constexpr int kNumChannels = 1;
+
+#elif defined(USE_96x96x3_MODEL)
+constexpr int kNumCols = 96;
+constexpr int kNumRows = 96;
+constexpr int kNumChannels = 3;
+#endif
 
 constexpr int kMaxDataSize = kNumCols * kNumRows * kNumChannels;
 
 constexpr int kCategoryCount = 2;
-// constexpr int kPersonIndex = 1;
-// constexpr int kNotAPersonIndex = 0;
-// extern const char* kCategoryLabels[kCategoryCount];
+

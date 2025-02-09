@@ -7,6 +7,8 @@
 #include "keyword_detection/keyword_detection_benchmark.h"
 #elif defined(USE_SPEECH_BENCHMARK)
 #include "speech_recognition/speech_recognition_benchmark.h"
+#elif defined(USE_WAKEWORD_BENCHMARK)
+#include "wakeword_detection/wakeword_detection_benchmark.h"
 #endif
 
 void setup() {
@@ -16,6 +18,8 @@ void setup() {
   keyword_detection_setup();
   #elif defined(USE_SPEECH_BENCHMARK)
   speech_recognition_setup();
+  #elif defined(USE_WAKEWORD_BENCHMARK)
+  wakeword_detection_setup();
   #endif
 }
 
@@ -26,5 +30,7 @@ void loop() {
   keyword_detection_loop();
   #elif defined(USE_SPEECH_BENCHMARK)
   speech_recognition_loop();
+  #elif defined(USE_WAKEWORD_BENCHMARK)
+  wakeword_detection_loop();
   #endif
 }
