@@ -182,7 +182,7 @@ void wakeword_detection_loop() {
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Keyword recognition invoke");
+  uint32_t event_handle = profiler.BeginEvent("Wakeword detection invoke");
   #endif
 
   #ifdef ENABLE_LOGGING

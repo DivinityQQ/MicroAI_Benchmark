@@ -8,7 +8,8 @@
 //    #define USE_IMAGE_BENCHMARK
 //    #define USE_SPEECH_BENCHMARK
 //    #define USE_KEYWORD_BENCHMARK
-    #define USE_WAKEWORD_BENCHMARK
+//    #define USE_WAKEWORD_BENCHMARK
+    #define USE_KWS_BENCHMARK
 
 /*********************************************
  *          COMMON CONFIGURATION
@@ -16,14 +17,14 @@
 
 //    Whether or not to log and/or profile inference time data
 //    For measuring power consumption, not defining this is recommended
-//    #define ENABLE_PROFILING
-    #define ENABLE_LOGGING
+    #define ENABLE_PROFILING
+//    #define ENABLE_LOGGING
 
 /*********************************************
  *   IMAGE RECOGNITION BENCHMARK SETTINGS
  *********************************************/
 
-//    #define NUM_ITERATIONS 1
+    #define NUM_ITERATIONS 1
     #define START_WITH_PERSON 0
 
 /*********************************************
@@ -46,3 +47,7 @@
 
     #define USE_128x128x1_MODEL
 //    #define USE_96x96x3_MODEL
+
+/*********************************************
+ *  KEYWORD SPOTTING BENCHMARK SETTINGS
+ *********************************************/

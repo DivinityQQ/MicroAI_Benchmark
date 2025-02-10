@@ -17,9 +17,13 @@ limitations under the License.
 // This form is useful for compiling into a binary for devices that don't have a
 // file system.
 
+#include <arduino.h>
 #include "person_detect_model_data.h"
 
-// Keep model aligned to 8 bytes to guarantee aligned 64-bit accesses.
+#ifdef ARDUINO_TEENSY40
+PROGMEM
+#endif
+// Keep model aligned to 16 bytes to guarantee aligned 64-bit accesses.
 alignas(16) const unsigned char g_person_detect_model_data[] = {
     0x1c, 0x00, 0x00, 0x00, 0x54, 0x46, 0x4c, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x0e, 0x00, 0x18, 0x00, 0x04, 0x00, 0x08, 0x00, 0x0c, 0x00, 0x10, 0x00,
