@@ -5,11 +5,11 @@
  *********************************************/
 
 //    Uncomment ONE benchmark to use
-//    #define USE_IMAGE_BENCHMARK
-//    #define USE_SPEECH_BENCHMARK
-//    #define USE_KEYWORD_BENCHMARK
-//    #define USE_WAKEWORD_BENCHMARK
-    #define USE_KWS_BENCHMARK
+//    #define USE_PERSON_DETECTION_BENCHMARK
+//    #define USE_SPEECH_YES_NO_BENCHMARK
+//    #define USE_KWS_SCRAMBLED_16_8_BENCHMARK
+    #define USE_VISUAL_WAKEWORD_BENCHMARK
+//    #define USE_KWS_BENCHMARK
 
 /*********************************************
  *          COMMON CONFIGURATION
@@ -21,20 +21,20 @@
 //    #define ENABLE_LOGGING
 
 /*********************************************
- *   IMAGE RECOGNITION BENCHMARK SETTINGS
+ *   PERSON DETECTION BENCHMARK SETTINGS
  *********************************************/
 
     #define NUM_ITERATIONS 1
     #define START_WITH_PERSON 0
 
 /*********************************************
- *  SPEECH RECOGNITION BENCHMARK SETTINGS
+ *  SPEECH YES NO BENCHMARK SETTINGS
  *********************************************/
 
 //    (Add relevant configuration settings here)
 
 /*********************************************
- *  KEYWORD DETECTION BENCHMARK SETTINGS
+ *  KEYWORD SPOTTING SCRAMBLED BENCHMARK SETTINGS
  *********************************************/
 
 //    Uncomment ONE model to use
@@ -42,11 +42,11 @@
     #define USE_STANDARD_MODEL
 
 /*********************************************
- *  WAKEWORD DETECTION BENCHMARK SETTINGS
+ *  VISUAL WAKEWORD DETECTION BENCHMARK SETTINGS
  *********************************************/
 
-    #define USE_128x128x1_MODEL
-//    #define USE_96x96x3_MODEL
+//    #define USE_128x128x1_MODEL
+    #define USE_96x96x3_MODEL
 
 /*********************************************
  *  KEYWORD SPOTTING BENCHMARK SETTINGS

@@ -12,7 +12,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "config.h"
-#ifdef USE_IMAGE_BENCHMARK
+#ifdef USE_VISUAL_WAKEWORD_BENCHMARK
 
 #include <Arduino.h>
 
@@ -24,16 +24,20 @@ limitations under the License.
 #include <TensorFlow_Lite_CMSIS_NN.h>
 #endif
 
-#include "detection_responder.h"
-#include "image_provider.h"
+// #include "detection_responder.h"
+#include "data_provider.h"
 #include "model_settings.h"
-#include "person_detect_model_data.h"
 #include "tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
+#endif
+#ifdef USE_128x128x1_MODEL
+#include "vww3_128_128_INT8_model_data.h"
+#elif defined(USE_96x96x3_MODEL)
+#include "vww_96_int8_model_data.h"
 #endif
 
 // Globals, used for compatibility with Arduino-style sketches.
@@ -54,21 +58,21 @@ TfLiteTensor* input = nullptr;
 // signed value.
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
-constexpr int scratchBufSize = 60 * 1024;
+constexpr int scratchBufSize = 50 * 1024;
 #else
 constexpr int scratchBufSize = 0;
 #endif
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 81 * 1024 + scratchBufSize;
+#ifdef USE_128x128x1_MODEL
+constexpr int kTensorArenaSize = 175 * 1024 + scratchBufSize;
+#elif defined(USE_96x96x3_MODEL)
+constexpr int kTensorArenaSize = 100 * 1024 + scratchBufSize;
+#endif
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
-
-int8_t X = NUM_ITERATIONS;  // Change every NUM_ITERATIONS
-int8_t iteration_count = 0;  // Initialize iteration count
-bool person = START_WITH_PERSON;  // Whether to start with image with or without person
 }  // namespace
 
 // The name of this function is important for Arduino compatibility.
-void image_recognition_setup() {
+void visual_wakeword_detection_setup() {
 
   // Enable serial only when profiling is enabled and you intend to connect the kit to PC,
   // on some boards it might hang otherwise
@@ -101,7 +105,8 @@ void image_recognition_setup() {
 
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
-  model = tflite::GetModel(g_person_detect_model_data);
+  #ifdef USE_128x128x1_MODEL
+  model = tflite::GetModel(g_vww3_128_128_INT8_model_data);
   if (model->version() != TFLITE_SCHEMA_VERSION) {
     TF_LITE_REPORT_ERROR(error_reporter,
                          "Model provided is schema version %d not equal "
@@ -109,7 +114,17 @@ void image_recognition_setup() {
                          model->version(), TFLITE_SCHEMA_VERSION);
     return;
   }
-
+  #elif defined(USE_96x96x3_MODEL)
+  model = tflite::GetModel(g_vww_96_int8_model_data);
+  if (model->version() != TFLITE_SCHEMA_VERSION) {
+    TF_LITE_REPORT_ERROR(error_reporter,
+                         "Model provided is schema version %d not equal "
+                         "to supported version %d.",
+                         model->version(), TFLITE_SCHEMA_VERSION);
+    return;
+  }
+  #endif
+  
   // Pull in only the operation implementations we need.
   // This relies on a complete list of all the ops needed by this graph.
   // An easier approach is to just use the AllOpsResolver, but this will
@@ -118,11 +133,14 @@ void image_recognition_setup() {
   //
   // tflite::AllOpsResolver resolver;
   // NOLINTNEXTLINE(runtime-global-variables)
-  static tflite::MicroMutableOpResolver<5> micro_op_resolver;
-  micro_op_resolver.AddAveragePool2D();
+  static tflite::MicroMutableOpResolver<8> micro_op_resolver;
   micro_op_resolver.AddConv2D();
   micro_op_resolver.AddDepthwiseConv2D();
+  micro_op_resolver.AddPad();
+  micro_op_resolver.AddAdd();
+  micro_op_resolver.AddAveragePool2D();
   micro_op_resolver.AddReshape();
+  micro_op_resolver.AddFullyConnected();
   micro_op_resolver.AddSoftmax();
 
   // Build an interpreter to run the model with.
@@ -144,8 +162,8 @@ void image_recognition_setup() {
   }
 
   // Report the actual memory usage
-  // size_t used_bytes = interpreter->arena_used_bytes();
-  // TF_LITE_REPORT_ERROR(error_reporter, "Tensor Arena Used: %d bytes", used_bytes);
+  size_t used_bytes = interpreter->arena_used_bytes();
+  TF_LITE_REPORT_ERROR(error_reporter, "Tensor Arena Used: %d bytes", used_bytes);
 
   // Get information about the memory area to use for the model's input.
   input = interpreter->input(0);
@@ -153,26 +171,18 @@ void image_recognition_setup() {
 }
 
 // The name of this function is important for Arduino compatibility.
-void image_recognition_loop() {
+void visual_wakeword_detection_loop() {
 
-  // Get image from provider.
-  if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
-                            input->data.int8, person)) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Image load failed.");
-  }
-
-  // Increment the iteration count
-  iteration_count++;
-  // Check if iteration count is divisible by X
-  if (iteration_count % X == 0) {
-  // Toggle the person variable
-    person = !person;  // Changes 0 to 1 and 1 to 0
+  // Get data from provider.
+  if (kTfLiteOk != GetDataInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
+                            input->data.int8)) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
   }
 
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Image recognition invoke");
+  uint32_t event_handle = profiler.BeginEvent("Wakeword detection invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -205,24 +215,12 @@ void image_recognition_loop() {
   unsigned long inference_time = end_time - start_time;
 
   TF_LITE_REPORT_ERROR(error_reporter, "Inference time (ms): %d", inference_time);
+  #endif
 
   TfLiteTensor* output = interpreter->output(0);
-
-  // Process the inference results.
-  int8_t person_score = output->data.uint8[kPersonIndex];
-  int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
-
-  float person_score_f =
-      (person_score - output->params.zero_point) * output->params.scale;
-  float no_person_score_f =
-      (no_person_score - output->params.zero_point) * output->params.scale;
-
-  // Respond to detection
-  RespondToDetection(error_reporter, person_score_f, no_person_score_f);
-  #endif
 
   // Use delay to make the loop more distinguishable
   delay(500);
 }
 
-#endif // USE_IMAGE_BENCHMARK
+#endif // USE_VISUAL_WAKEWORD_BENCHMARK

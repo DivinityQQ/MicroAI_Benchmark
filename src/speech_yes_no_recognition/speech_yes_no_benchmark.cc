@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "config.h"
-#ifdef USE_SPEECH_BENCHMARK
+#ifdef USE_SPEECH_YES_NO_BENCHMARK
 
 #include <Arduino.h>
 
@@ -64,7 +64,7 @@ int8_t* model_input_buffer = nullptr;
 }  // namespace
 
 // The name of this function is important for Arduino compatibility.
-void speech_recognition_setup() {
+void speech_yes_no_setup() {
 
   // Enable serial only when profiling is enabled and you intend to connect the kit to PC,
   // on some boards it might hang otherwise
@@ -151,7 +151,7 @@ void speech_recognition_setup() {
 }
 
 // The name of this function is important for Arduino compatibility.
-void speech_recognition_loop() {
+void speech_yes_no_loop() {
   // Fetch the spectrogram for the current time.
   const int32_t dummy_time = 0;
   int how_many_new_slices = 0;
@@ -250,4 +250,4 @@ void speech_recognition_loop() {
   delay(500);
 }
 
-#endif // USE_SPEECH_BENCHMARK
+#endif // USE_SPEECH_YES_NO_BENCHMARK
