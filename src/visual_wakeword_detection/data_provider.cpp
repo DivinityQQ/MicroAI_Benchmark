@@ -17,7 +17,7 @@ limitations under the License.
 // #include "person_image_data.h"
 // #include "no_person_image_data.h"
 
-TfLiteStatus GetDataInt8(tflite::ErrorReporter* error_reporter, int first_dimension,
+TfLiteStatus GetDataVWWInt8(tflite::ErrorReporter* error_reporter, int first_dimension,
                             int second_dimension, int third_dimension, int8_t* test_data) {
 
   int data_size = first_dimension * second_dimension * third_dimension;

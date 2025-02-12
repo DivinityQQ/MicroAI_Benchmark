@@ -28,6 +28,9 @@ limitations under the License.
 // The reference implementation can have no platform-specific dependencies, so
 // it just returns a static image. For real applications, you should
 // ensure there's a specialized implementation that accesses hardware APIs.
-TfLiteStatus GetDataFloat32(tflite::ErrorReporter* error_reporter, int first_dimension,
+TfLiteStatus GetDataKWSFloat32(tflite::ErrorReporter* error_reporter, int first_dimension,
                     int second_dimension, int third_dimension, float* test_data);
+
+TfLiteStatus GetDataKWSInt8(tflite::ErrorReporter* error_reporter, int first_dimension,
+                            int second_dimension, int third_dimension, int8_t* test_data);
 

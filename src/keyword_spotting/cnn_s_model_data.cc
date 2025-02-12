@@ -1,5 +1,6 @@
-
 #include <arduino.h>
+#include <cstdint>
+
 #include "cnn_s_model_data.h"
 
 #ifdef ARDUINO_TEENSY40

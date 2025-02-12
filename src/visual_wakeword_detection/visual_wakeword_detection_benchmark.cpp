@@ -174,7 +174,7 @@ void visual_wakeword_detection_setup() {
 void visual_wakeword_detection_loop() {
 
   // Get data from provider.
-  if (kTfLiteOk != GetDataInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
+  if (kTfLiteOk != GetDataVWWInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.int8)) {
     TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
   }

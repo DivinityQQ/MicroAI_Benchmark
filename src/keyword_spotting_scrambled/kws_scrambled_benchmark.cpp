@@ -155,7 +155,7 @@ void kws_scrambled_setup() {
 void kws_scrambled_loop() {
 
   // Get data from provider.
-  if (kTfLiteOk != GetData(error_reporter, kNumCols, kNumRows, kNumChannels,
+  if (kTfLiteOk != GetDataKWSInt16(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.i16)) {
     TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
   }

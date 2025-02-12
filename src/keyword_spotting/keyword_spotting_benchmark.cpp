@@ -34,7 +34,23 @@ limitations under the License.
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
 #endif
+#ifdef USE_CNN_SMALL_FLOAT32_MODEL
 #include "cnn_s_model_data.h"
+#elif defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+#include "cnn_m_model_data.h"
+#elif defined(USE_CNN_SMALL_INT8_MODEL)
+#include "cnn_s_quantized_model_data.h"
+#elif defined(USE_CNN_MEDIUM_INT8_MODEL)
+#include "cnn_m_quantized_model_data.h"
+#elif defined(USE_CNN_LARGE_INT8_MODEL)
+#include "cnn_l_quantized_model_data.h"
+#elif defined(USE_DNN_SMALL_INT8_MODEL)
+#include "dnn_s_quantized_model_data.h"
+#elif defined(USE_DNN_MEDIUM_INT8_MODEL)
+#include "dnn_m_quantized_model_data.h"
+#elif defined(USE_DNN_LARGE_INT8_MODEL)
+#include "dnn_l_quantized_model_data.h"
+#endif
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -59,7 +75,7 @@ constexpr int scratchBufSize = 30 * 1024;
 constexpr int scratchBufSize = 0;
 #endif
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 41 * 1024 + scratchBufSize;
+constexpr int kTensorArenaSize = 100 * 1024 + scratchBufSize;
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 }  // namespace
 
@@ -97,7 +113,24 @@ void keyword_spotting_setup() {
 
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
+  #ifdef USE_CNN_SMALL_FLOAT32_MODEL
   model = tflite::GetModel(g_cnn_s_model_data);
+  #elif defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+  model = tflite::GetModel(g_cnn_m_model_data);
+  #elif defined(USE_CNN_SMALL_INT8_MODEL)
+  model = tflite::GetModel(g_cnn_s_quantized_model_data);
+  #elif defined(USE_CNN_MEDIUM_INT8_MODEL)
+  model = tflite::GetModel(g_cnn_m_quantized_model_data);
+  #elif defined(USE_CNN_LARGE_INT8_MODEL)
+  model = tflite::GetModel(g_cnn_l_quantized_model_data);
+  #elif defined(USE_DNN_SMALL_INT8_MODEL)
+  model = tflite::GetModel(g_dnn_s_quantized_model_data);
+  #elif defined(USE_DNN_MEDIUM_INT8_MODEL)
+  model = tflite::GetModel(g_dnn_m_quantized_model_data);
+  #elif defined(USE_DNN_LARGE_INT8_MODEL)
+  model = tflite::GetModel(g_dnn_l_quantized_model_data);
+  #endif
+  
   if (model->version() != TFLITE_SCHEMA_VERSION) {
     TF_LITE_REPORT_ERROR(error_reporter,
                          "Model provided is schema version %d not equal "
@@ -151,10 +184,17 @@ void keyword_spotting_setup() {
 void keyword_spotting_loop() {
 
   // Get data from provider.
-  if (kTfLiteOk != GetDataFloat32(error_reporter, kNumCols, kNumRows, kNumChannels,
+  #if defined(USE_CNN_SMALL_FLOAT32_MODEL) || defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+  if (kTfLiteOk != GetDataKWSFloat32(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.f)) {
     TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
   }
+  #else
+  if (kTfLiteOk != GetDataKWSInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
+                            input->data.int8)) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
+  }
+  #endif
 
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
