@@ -38,8 +38,8 @@
  *********************************************/
 
 //    Uncomment ONE model to use
-//    #define USE_8BIT_MODEL
-    #define USE_STANDARD_MODEL
+    #define USE_8BIT_MODEL
+//    #define USE_STANDARD_MODEL
 
 /*********************************************
  *  VISUAL WAKEWORD DETECTION BENCHMARK SETTINGS
@@ -52,8 +52,8 @@
  *  KEYWORD SPOTTING BENCHMARK SETTINGS
  *********************************************/
 
-//    #define USE_CNN_SMALL_FLOAT32_MODEL
-    #define USE_CNN_MEDIUM_FLOAT32_MODEL
+    #define USE_CNN_SMALL_FLOAT32_MODEL
+//    #define USE_CNN_MEDIUM_FLOAT32_MODEL
 //    #define USE_CNN_SMALL_INT8_MODEL
 //    #define USE_CNN_MEDIUM_INT8_MODEL
 //    #define USE_CNN_LARGE_INT8_MODEL
