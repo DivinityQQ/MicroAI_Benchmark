@@ -107,15 +107,10 @@ void visual_wakeword_detection_setup() {
   // copying or parsing, it's a very lightweight operation.
   #ifdef USE_128x128x1_MODEL
   model = tflite::GetModel(g_vww3_128_128_INT8_model_data);
-  if (model->version() != TFLITE_SCHEMA_VERSION) {
-    TF_LITE_REPORT_ERROR(error_reporter,
-                         "Model provided is schema version %d not equal "
-                         "to supported version %d.",
-                         model->version(), TFLITE_SCHEMA_VERSION);
-    return;
-  }
   #elif defined(USE_96x96x3_MODEL)
   model = tflite::GetModel(g_vww_96_int8_model_data);
+  #endif
+
   if (model->version() != TFLITE_SCHEMA_VERSION) {
     TF_LITE_REPORT_ERROR(error_reporter,
                          "Model provided is schema version %d not equal "
@@ -123,8 +118,6 @@ void visual_wakeword_detection_setup() {
                          model->version(), TFLITE_SCHEMA_VERSION);
     return;
   }
-  #endif
-  
   // Pull in only the operation implementations we need.
   // This relies on a complete list of all the ops needed by this graph.
   // An easier approach is to just use the AllOpsResolver, but this will
