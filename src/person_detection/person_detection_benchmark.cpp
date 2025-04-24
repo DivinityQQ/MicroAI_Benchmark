@@ -35,6 +35,9 @@ limitations under the License.
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
 #endif
+#ifdef ENABLE_MEMORY_MONITORING
+#include "tensorflow/lite/micro/recording_micro_interpreter.h"
+#endif
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -43,7 +46,11 @@ tflite::MicroProfiler profiler;
 #endif
 tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
+#ifdef ENABLE_MEMORY_MONITORING
+tflite::RecordingMicroInterpreter* interpreter = nullptr;
+#else
 tflite::MicroInterpreter* interpreter = nullptr;
+#endif
 TfLiteTensor* input = nullptr;
 
 // In order to use optimized tensorflow lite kernels, a signed int8_t quantized
@@ -127,10 +134,20 @@ void person_detection_setup() {
 
   // Build an interpreter to run the model with.
   // NOLINTNEXTLINE(runtime-global-variables)
-  #ifdef ENABLE_PROFILING
+  #if defined(ENABLE_MEMORY_MONITORING) && defined(ENABLE_PROFILING)
+  // Both memory monitoring and profiling enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
+  #elif defined(ENABLE_MEMORY_MONITORING)
+  // Only memory monitoring enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+  #elif defined(ENABLE_PROFILING)
+  // Only profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
   #else
+  // Neither memory monitoring nor profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize);
   #endif
@@ -198,6 +215,11 @@ void person_detection_loop() {
   profiler.LogTicksPerTag();
 
   profiler.ClearEvents();
+  #endif
+
+  #ifdef ENABLE_MEMORY_MONITORING
+  // Print out detailed allocation information:
+  interpreter->GetMicroAllocator().PrintAllocations();
   #endif
 
   #ifdef ENABLE_LOGGING

@@ -18,6 +18,7 @@
 //    Whether or not to log and/or profile inference time data
 //    For measuring power consumption, not defining this is recommended
     #define ENABLE_PROFILING
+    #define ENABLE_MEMORY_MONITORING
 //    #define ENABLE_LOGGING
 
 /*********************************************
@@ -52,8 +53,8 @@
  *  KEYWORD SPOTTING BENCHMARK SETTINGS
  *********************************************/
 
-    #define USE_CNN_SMALL_FLOAT32_MODEL
-//    #define USE_CNN_MEDIUM_FLOAT32_MODEL
+//    #define USE_CNN_SMALL_FLOAT32_MODEL
+    #define USE_CNN_MEDIUM_FLOAT32_MODEL
 //    #define USE_CNN_SMALL_INT8_MODEL
 //    #define USE_CNN_MEDIUM_INT8_MODEL
 //    #define USE_CNN_LARGE_INT8_MODEL

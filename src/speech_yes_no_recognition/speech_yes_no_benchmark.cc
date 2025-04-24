@@ -42,6 +42,9 @@ limitations under the License.
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
 #endif
+#ifdef ENABLE_MEMORY_MONITORING
+#include "tensorflow/lite/micro/recording_micro_interpreter.h"
+#endif
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -50,7 +53,11 @@ tflite::MicroProfiler profiler;
 #endif
 const tflite::Model* model = nullptr;
 tflite::ErrorReporter* error_reporter = nullptr;
+#ifdef ENABLE_MEMORY_MONITORING
+tflite::RecordingMicroInterpreter* interpreter = nullptr;
+#else
 tflite::MicroInterpreter* interpreter = nullptr;
+#endif
 TfLiteTensor* model_input = nullptr;
 FeatureProvider* feature_provider = nullptr;
 
@@ -114,10 +121,20 @@ void speech_yes_no_setup() {
 
   // Build an interpreter to run the model with.
   // NOLINTNEXTLINE(runtime-global-variables)
-  #ifdef ENABLE_PROFILING
+  #if defined(ENABLE_MEMORY_MONITORING) && defined(ENABLE_PROFILING)
+  // Both memory monitoring and profiling enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
+  #elif defined(ENABLE_MEMORY_MONITORING)
+  // Only memory monitoring enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+  #elif defined(ENABLE_PROFILING)
+  // Only profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, nullptr, &profiler);
   #else
+  // Neither memory monitoring nor profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize);
   #endif
@@ -208,18 +225,22 @@ void speech_yes_no_loop() {
   #ifdef ENABLE_PROFILING
   // End profiling for this event
   profiler.EndEvent(event_handle);
-
   // Log the profiling data
   profiler.LogTicksPerTag();
 
   profiler.ClearEvents();
   #endif
 
+  #ifdef ENABLE_MEMORY_MONITORING
+  // Print out detailed allocation information:
+  interpreter->GetMicroAllocator().PrintAllocations();
+  #endif
+
   #ifdef ENABLE_LOGGING
   // Calculate inference time
   unsigned long inference_time_recognition = end_time_recognition - start_time_recognition;
 
-  TF_LITE_REPORT_ERROR(error_reporter, "Speech ecognition inference time (ms): %d", inference_time_recognition);
+  TF_LITE_REPORT_ERROR(error_reporter, "Speech recognition inference time (ms): %d", inference_time_recognition);
 
   // Obtain a pointer to the output tensor
   TfLiteTensor* output = interpreter->output(0);
