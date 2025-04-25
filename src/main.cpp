@@ -11,6 +11,8 @@
 #include "visual_wakeword_detection/visual_wakeword_detection_benchmark.h"
 #elif defined(USE_KWS_BENCHMARK)
 #include "keyword_spotting/keyword_spotting_benchmark.h"
+#elif defined(USE_NOISE_REDUCTION_BENCHMARK)
+#include "noise_reduction/noise_reduction_benchmark.h"
 #endif
 
 void setup() {
@@ -24,6 +26,8 @@ void setup() {
   visual_wakeword_detection_setup();
   #elif defined(USE_KWS_BENCHMARK)
   keyword_spotting_setup();
+  #elif defined(USE_NOISE_REDUCTION_BENCHMARK)
+  noise_reduction_setup();
   #endif
 }
 
@@ -38,5 +42,7 @@ void loop() {
   visual_wakeword_detection_loop();
   #elif defined(USE_KWS_BENCHMARK)
   keyword_spotting_loop();
+  #elif defined(USE_NOISE_REDUCTION_BENCHMARK)
+  noise_reduction_loop();
   #endif
 }

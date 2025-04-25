@@ -18,12 +18,12 @@ limitations under the License.
 
 // All of these values are derived from the values used during model training,
 // if you change your model you'll need to update these constants.
-#if defined(USE_DNN_SMALL_INT8_MODEL) || defined(USE_DNN_MEDIUM_INT8_MODEL) || defined(USE_DNN_LARGE_INT8_MODEL)
+#if defined(USE_DNN_SMALL_INT8_MODEL) || defined(USE_DNN_MEDIUM_INT8_MODEL) || defined(USE_DNN_LARGE_INT8_MODEL) || defined(USE_DNN_SMALL_FLOAT32_MODEL) || defined(USE_DNN_MEDIUM_FLOAT32_MODEL)
 constexpr int kNumCols = 250;
 constexpr int kNumRows = 1;
 constexpr int kNumChannels = 1;
 #else // CNN models
-constexpr int kNumCols = 460;
+constexpr int kNumCols = 490;
 constexpr int kNumRows = 1;
 constexpr int kNumChannels = 1;
 #endif

@@ -14,7 +14,7 @@ limitations under the License.
 #include "model_settings.h"
 #include "data_provider.h"
 
-TfLiteStatus GetDataKWSInt16(tflite::ErrorReporter* error_reporter, int first_dimension,
+TfLiteStatus GetDataKWSScrambledInt16(tflite::ErrorReporter* error_reporter, int first_dimension,
                             int second_dimension, int third_dimension, int16_t* test_data) {
 
   int data_size = first_dimension * second_dimension * third_dimension;

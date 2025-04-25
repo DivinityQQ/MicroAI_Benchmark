@@ -10,6 +10,7 @@
 //    #define USE_KWS_SCRAMBLED_16_8_BENCHMARK
 //    #define USE_VISUAL_WAKEWORD_BENCHMARK
     #define USE_KWS_BENCHMARK
+//    #define USE_NOISE_REDUCTION_BENCHMARK
 
 /*********************************************
  *          COMMON CONFIGURATION
@@ -54,10 +55,18 @@
  *********************************************/
 
 //    #define USE_CNN_SMALL_FLOAT32_MODEL
-    #define USE_CNN_MEDIUM_FLOAT32_MODEL
-//    #define USE_CNN_SMALL_INT8_MODEL
+//    #define USE_CNN_MEDIUM_FLOAT32_MODEL
+    #define USE_CNN_SMALL_INT8_MODEL
 //    #define USE_CNN_MEDIUM_INT8_MODEL
 //    #define USE_CNN_LARGE_INT8_MODEL
 //    #define USE_DNN_SMALL_INT8_MODEL
 //    #define USE_DNN_MEDIUM_INT8_MODEL
 //    #define USE_DNN_LARGE_INT8_MODEL
+//    #define USE_DNN_SMALL_FLOAT32_MODEL
+//    #define USE_DNN_MEDIUM_FLOAT32_MODEL
+//    #define USE_DS_CNN_SMALL_INT8_MODEL
+//    #define USE_DS_CNN_MEDIUM_INT8_MODEL
+//    #define USE_DS_CNN_LARGE_INT8_MODEL
+//    #define USE_DS_CNN_SMALL_FLOAT32_MODEL
+//    #define USE_DS_CNN_MEDIUM_FLOAT32_MODEL
+//    #define USE_DS_CNN_SMALL_INT16_MODEL

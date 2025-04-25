@@ -34,3 +34,6 @@ TfLiteStatus GetDataKWSFloat32(tflite::ErrorReporter* error_reporter, int first_
 TfLiteStatus GetDataKWSInt8(tflite::ErrorReporter* error_reporter, int first_dimension,
                             int second_dimension, int third_dimension, int8_t* test_data);
 
+TfLiteStatus GetDataKWSInt16(tflite::ErrorReporter* error_reporter, int first_dimension,
+                            int second_dimension, int third_dimension, int16_t* test_data);
+

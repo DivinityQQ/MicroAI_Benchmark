@@ -53,6 +53,22 @@ limitations under the License.
 #include "dnn_m_quantized_model_data.h"
 #elif defined(USE_DNN_LARGE_INT8_MODEL)
 #include "dnn_l_quantized_model_data.h"
+#elif defined(USE_DNN_SMALL_FLOAT32_MODEL)
+#include "dnn_s_model_data.h"
+#elif defined(USE_DNN_MEDIUM_FLOAT32_MODEL)
+#include "dnn_m_model_data.h"
+#elif defined(USE_DS_CNN_SMALL_INT8_MODEL)
+#include "ds_cnn_s_quantized_model_data.h"
+#elif defined(USE_DS_CNN_MEDIUM_INT8_MODEL)
+#include "ds_cnn_m_quantized_model_data.h"
+#elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
+#include "ds_cnn_l_quantized_model_data.h"
+#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+#include "ds_cnn_s_quantized_int16_model_data.h"
+#elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
+#include "ds_cnn_s_model_data.h"
+#else
+#include "ds_cnn_m_model_data.h"
 #endif
 
 // Globals, used for compatibility with Arduino-style sketches.
@@ -77,12 +93,12 @@ TfLiteTensor* input = nullptr;
 // signed value.
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
-constexpr int scratchBufSize = 150 * 1024;
+constexpr int scratchBufSize = 75 * 1024;
 #else
 constexpr int scratchBufSize = 0;
 #endif
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 100 * 1024 + scratchBufSize;
+constexpr int kTensorArenaSize = 150 * 1024 + scratchBufSize;
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 }  // namespace
 
@@ -136,6 +152,22 @@ void keyword_spotting_setup() {
   model = tflite::GetModel(g_dnn_m_quantized_model_data);
   #elif defined(USE_DNN_LARGE_INT8_MODEL)
   model = tflite::GetModel(g_dnn_l_quantized_model_data);
+  #elif defined(USE_DNN_SMALL_FLOAT32_MODEL)
+  model = tflite::GetModel(g_dnn_s_model_data);
+  #elif defined(USE_DNN_MEDIUM_FLOAT32_MODEL)
+  model = tflite::GetModel(g_dnn_m_model_data);
+  #elif defined(USE_DS_CNN_SMALL_INT8_MODEL)
+  model = tflite::GetModel(g_ds_cnn_s_quantized_model_data);
+  #elif defined(USE_DS_CNN_MEDIUM_INT8_MODEL)
+  model = tflite::GetModel(g_ds_cnn_m_quantized_model_data);
+  #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
+  model = tflite::GetModel(g_ds_cnn_l_quantized_model_data);
+  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+  model = tflite::GetModel(g_ds_cnn_s_quantized_int16_model_data);
+  #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
+  model = tflite::GetModel(g_ds_cnn_s_model_data);
+  #else
+  model = tflite::GetModel(g_ds_cnn_m_model_data);
   #endif
   
   if (model->version() != TFLITE_SCHEMA_VERSION) {
@@ -154,9 +186,11 @@ void keyword_spotting_setup() {
   //
   // tflite::AllOpsResolver resolver;
   // NOLINTNEXTLINE(runtime-global-variables)
-  static tflite::MicroMutableOpResolver<4> micro_op_resolver;
+  static tflite::MicroMutableOpResolver<6> micro_op_resolver;
   micro_op_resolver.AddReshape();
   micro_op_resolver.AddConv2D();
+  micro_op_resolver.AddDepthwiseConv2D();
+  micro_op_resolver.AddAveragePool2D();
   micro_op_resolver.AddFullyConnected();
   micro_op_resolver.AddSoftmax();
 
@@ -201,9 +235,14 @@ void keyword_spotting_setup() {
 void keyword_spotting_loop() {
 
   // Get data from provider.
-  #if defined(USE_CNN_SMALL_FLOAT32_MODEL) || defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+  #if defined(USE_CNN_SMALL_FLOAT32_MODEL) || defined(USE_CNN_MEDIUM_FLOAT32_MODEL) || defined(USE_DNN_SMALL_FLOAT32_MODEL) || defined(USE_DNN_MEDIUM_FLOAT32_MODEL) || defined(USE_DS_CNN_SMALL_FLOAT32_MODEL) || defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
   if (kTfLiteOk != GetDataKWSFloat32(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.f)) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
+  }
+  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+  if (kTfLiteOk != GetDataKWSInt16(error_reporter, kNumCols, kNumRows, kNumChannels,
+                            input->data.i16)) {
     TF_LITE_REPORT_ERROR(error_reporter, "Data load failed.");
   }
   #else
