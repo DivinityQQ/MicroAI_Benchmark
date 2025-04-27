@@ -28,6 +28,9 @@ limitations under the License.
 #ifdef ENABLE_PROFILING
 #include "tensorflow/lite/micro/micro_profiler.h"
 #endif
+#ifdef ENABLE_MEMORY_MONITORING
+#include "tensorflow/lite/micro/recording_micro_interpreter.h"
+#endif
 
 namespace {
 
@@ -40,7 +43,11 @@ bool g_is_first_time = true;
 
 const tflite::Model* model = nullptr;
 tflite::ErrorReporter* error_reporter = nullptr;
+#ifdef ENABLE_MEMORY_MONITORING
+tflite::RecordingMicroInterpreter* interpreter = nullptr;
+#else
 tflite::MicroInterpreter* interpreter = nullptr;
+#endif
 
 constexpr size_t kArenaSize = 16 * 1024;
 alignas(16) uint8_t g_arena[kArenaSize];
@@ -97,10 +104,20 @@ TfLiteStatus InitializeMicroFeatures() {
   static AudioPreprocessorOpResolver op_resolver;
   RegisterOps(op_resolver);
 
-  #ifdef ENABLE_PROFILING
+  #if defined(ENABLE_MEMORY_MONITORING) && defined(ENABLE_PROFILING)
+  // Both memory monitoring and profiling enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, op_resolver, g_arena, kArenaSize, nullptr, &spectrogram_profiler);
+  #elif defined(ENABLE_MEMORY_MONITORING)
+  // Only memory monitoring enabled
+  static tflite::RecordingMicroInterpreter static_interpreter(
+      model, op_resolver, g_arena, kArenaSize);
+  #elif defined(ENABLE_PROFILING)
+  // Only profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, op_resolver, g_arena, kArenaSize, nullptr, &spectrogram_profiler);
   #else
+  // Neither memory monitoring nor profiling enabled
   static tflite::MicroInterpreter static_interpreter(
       model, op_resolver, g_arena, kArenaSize);
   #endif
@@ -164,6 +181,11 @@ TfLiteStatus GenerateFeatures(const int16_t* audio_data,
   spectrogram_profiler.LogTicksPerTag();
 
   spectrogram_profiler.ClearEvents();
+  #endif
+
+  #ifdef ENABLE_MEMORY_MONITORING
+  // Print out detailed allocation information:
+  interpreter->GetMicroAllocator().PrintAllocations();
   #endif
 
   return kTfLiteOk;

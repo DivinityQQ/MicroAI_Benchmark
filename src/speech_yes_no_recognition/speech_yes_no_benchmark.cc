@@ -46,6 +46,8 @@ limitations under the License.
 #include "tensorflow/lite/micro/recording_micro_interpreter.h"
 #endif
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -173,6 +175,8 @@ void speech_yes_no_loop() {
   const int32_t dummy_time = 0;
   int how_many_new_slices = 0;
 
+  print_benchmark_start_custom("SPEECH_YES_NO_FEATURE");
+
   #ifdef ENABLE_LOGGING
   // Record time before inference
   unsigned long start_time_spectrogram = millis();
@@ -195,10 +199,14 @@ void speech_yes_no_loop() {
   TF_LITE_REPORT_ERROR(error_reporter, "Spectrogram builder inference time (ms): %d", inference_time_spectrogram);
   #endif
 
+  print_benchmark_end();
+
   // Copy feature buffer to input tensor
   for (int i = 0; i < kFeatureElementCount; i++) {
     model_input_buffer[i] = feature_buffer[i];
   }
+
+  print_benchmark_start_custom("SPEECH_YES_NO_MODEL");
 
   #ifdef ENABLE_PROFILING
   // Start profiling the inference event
@@ -268,6 +276,8 @@ void speech_yes_no_loop() {
   }
   #endif
 
+  print_benchmark_end();
+  
   delay(500);
 }
 

@@ -43,6 +43,8 @@ limitations under the License.
 #include "keyword_scrambled_model_data.h"
 #endif
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -171,6 +173,8 @@ void kws_scrambled_setup() {
 // The name of this function is important for Arduino compatibility.
 void kws_scrambled_loop() {
 
+  print_benchmark_start();
+
   // Get data from provider.
   if (kTfLiteOk != GetDataKWSScrambledInt16(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.i16)) {
@@ -180,7 +184,7 @@ void kws_scrambled_loop() {
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Keyword detection invoke");
+  uint32_t event_handle = profiler.BeginEvent("Keyword spotting scrambled invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -221,6 +225,8 @@ void kws_scrambled_loop() {
   #endif
 
   TfLiteTensor* output = interpreter->output(0);
+
+  print_benchmark_end();
 
   // Use delay to make the loop more distinguishable
   delay(500);

@@ -43,6 +43,8 @@ limitations under the License.
 #include "vww_96_int8_model_data.h"
 #endif
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -183,6 +185,8 @@ void visual_wakeword_detection_setup() {
 // The name of this function is important for Arduino compatibility.
 void visual_wakeword_detection_loop() {
 
+  print_benchmark_start();
+
   // Get data from provider.
   if (kTfLiteOk != GetDataVWWInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.int8)) {
@@ -233,6 +237,8 @@ void visual_wakeword_detection_loop() {
   #endif
 
   TfLiteTensor* output = interpreter->output(0);
+
+  print_benchmark_end();
 
   // Use delay to make the loop more distinguishable
   delay(500);

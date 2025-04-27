@@ -71,6 +71,8 @@ limitations under the License.
 #include "ds_cnn_m_model_data.h"
 #endif
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -234,6 +236,8 @@ void keyword_spotting_setup() {
 // The name of this function is important for Arduino compatibility.
 void keyword_spotting_loop() {
 
+  print_benchmark_start();
+
   // Get data from provider.
   #if defined(USE_CNN_SMALL_FLOAT32_MODEL) || defined(USE_CNN_MEDIUM_FLOAT32_MODEL) || defined(USE_DNN_SMALL_FLOAT32_MODEL) || defined(USE_DNN_MEDIUM_FLOAT32_MODEL) || defined(USE_DS_CNN_SMALL_FLOAT32_MODEL) || defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
   if (kTfLiteOk != GetDataKWSFloat32(error_reporter, kNumCols, kNumRows, kNumChannels,
@@ -296,6 +300,8 @@ void keyword_spotting_loop() {
   #endif
 
   TfLiteTensor* output = interpreter->output(0);
+
+  print_benchmark_end();
 
   // Use delay to make the loop more distinguishable
   delay(500);

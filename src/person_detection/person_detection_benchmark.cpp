@@ -39,6 +39,8 @@ limitations under the License.
 #include "tensorflow/lite/micro/recording_micro_interpreter.h"
 #endif
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -172,6 +174,8 @@ void person_detection_setup() {
 // The name of this function is important for Arduino compatibility.
 void person_detection_loop() {
 
+  print_benchmark_start();
+
   // Get image from provider.
   if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
                             input->data.int8, person)) {
@@ -189,7 +193,7 @@ void person_detection_loop() {
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Image recognition invoke");
+  uint32_t event_handle = profiler.BeginEvent("Person detection invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -242,6 +246,8 @@ void person_detection_loop() {
   // Respond to detection
   RespondToDetection(error_reporter, person_score_f, no_person_score_f);
   #endif
+
+  print_benchmark_end();
 
   // Use delay to make the loop more distinguishable
   delay(500);

@@ -39,6 +39,8 @@ limitations under the License.
 #endif
 #include "rnnoise_INT8_model_data.h"
 
+#include "common/benchmark_utils.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 #ifdef ENABLE_PROFILING
@@ -176,6 +178,8 @@ void noise_reduction_setup() {
 // The name of this function is important for Arduino compatibility.
 void noise_reduction_loop() {
 
+  print_benchmark_start();
+
   /*
   // Get data from provider.
   if (kTfLiteOk != GetDataVWWInt8(error_reporter, kNumCols, kNumRows, kNumChannels,
@@ -187,7 +191,7 @@ void noise_reduction_loop() {
   #ifdef ENABLE_PROFILING
   // Code path when logging is enabled, affects power consumption
   // Start profiling the inference event
-  uint32_t event_handle = profiler.BeginEvent("Wakeword detection invoke");
+  uint32_t event_handle = profiler.BeginEvent("Noise reduction invoke");
   #endif
 
   #ifdef ENABLE_LOGGING
@@ -228,6 +232,8 @@ void noise_reduction_loop() {
   #endif
 
   TfLiteTensor* output = interpreter->output(0);
+
+  print_benchmark_end();
 
   // Use delay to make the loop more distinguishable
   delay(500);
