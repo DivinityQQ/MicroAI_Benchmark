@@ -63,11 +63,15 @@ tflite::MicroInterpreter* interpreter = nullptr;
 TfLiteTensor* model_input = nullptr;
 FeatureProvider* feature_provider = nullptr;
 
-// Create an area of memory to use for input, output, and intermediate arrays.
-// The size of this will depend on the model you're using, and may need to be
-// determined by experimentation.
-constexpr int kTensorArenaSize = 30 * 1024;
-alignas(16) uint8_t tensor_arena[kTensorArenaSize];
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
+constexpr int scratchBufSize = 0 * 1024;
+#else
+constexpr int scratchBufSize = 0;
+#endif
+// An area of memory to use for input, output, and intermediate arrays.
+constexpr int kTensorArenaSize = 8 * 1024 + scratchBufSize;
+alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
+
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
 }  // namespace

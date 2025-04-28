@@ -49,7 +49,12 @@ tflite::RecordingMicroInterpreter* interpreter = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
 #endif
 
-constexpr size_t kArenaSize = 16 * 1024;
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
+constexpr int scratchBufSize = 0 * 1024;
+#else
+constexpr int scratchBufSize = 0;
+#endif
+constexpr size_t kArenaSize = 10 * 1024 + scratchBufSize;
 alignas(16) uint8_t g_arena[kArenaSize];
 
 constexpr int kAudioSampleDurationCount =

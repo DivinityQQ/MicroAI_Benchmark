@@ -95,12 +95,76 @@ TfLiteTensor* input = nullptr;
 // signed value.
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
-constexpr int scratchBufSize = 75 * 1024;
+  #ifdef USE_CNN_SMALL_FLOAT32_MODEL
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_CNN_SMALL_INT8_MODEL)
+  constexpr int scratchBufSize = 34 * 1024;
+  #elif defined(USE_CNN_MEDIUM_INT8_MODEL)
+  constexpr int scratchBufSize = 113 * 1024;
+  #elif defined(USE_CNN_LARGE_INT8_MODEL)
+  constexpr int scratchBufSize = 186 * 1024;
+  #elif defined(USE_DNN_SMALL_INT8_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DNN_MEDIUM_INT8_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DNN_LARGE_INT8_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DNN_SMALL_FLOAT32_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DNN_MEDIUM_FLOAT32_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DS_CNN_SMALL_INT8_MODEL)
+  constexpr int scratchBufSize = 34 * 1024;
+  #elif defined(USE_DS_CNN_MEDIUM_INT8_MODEL)
+  constexpr int scratchBufSize = 100 * 1024;
+  #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
+  constexpr int scratchBufSize = 160 * 1024;
+  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
+  constexpr int scratchBufSize = 4 * 1024;
+  #else
+  constexpr int scratchBufSize = 12 * 1024;
+  #endif
 #else
 constexpr int scratchBufSize = 0;
 #endif
+#ifdef USE_CNN_SMALL_FLOAT32_MODEL
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 150 * 1024 + scratchBufSize;
+constexpr int kTensorArenaSize = 41 * 1024 + scratchBufSize;
+#elif defined(USE_CNN_MEDIUM_FLOAT32_MODEL)
+constexpr int kTensorArenaSize = 86 * 1024 + scratchBufSize;
+#elif defined(USE_CNN_SMALL_INT8_MODEL)
+constexpr int kTensorArenaSize = 17 * 1024 + scratchBufSize;
+#elif defined(USE_CNN_MEDIUM_INT8_MODEL)
+constexpr int kTensorArenaSize = 34 * 1024 + scratchBufSize;
+#elif defined(USE_CNN_LARGE_INT8_MODEL)
+constexpr int kTensorArenaSize = 34 * 1024 + scratchBufSize;
+#elif defined(USE_DNN_SMALL_INT8_MODEL)
+constexpr int kTensorArenaSize = 3 * 1024 + scratchBufSize;
+#elif defined(USE_DNN_MEDIUM_INT8_MODEL)
+constexpr int kTensorArenaSize = 3 * 1024 + scratchBufSize;
+#elif defined(USE_DNN_LARGE_INT8_MODEL)
+constexpr int kTensorArenaSize = 4 * 1024 + scratchBufSize;
+#elif defined(USE_DNN_SMALL_FLOAT32_MODEL)
+constexpr int kTensorArenaSize = 4 * 1024 + scratchBufSize;
+#elif defined(USE_DNN_MEDIUM_FLOAT32_MODEL)
+constexpr int kTensorArenaSize = 5 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_SMALL_INT8_MODEL)
+constexpr int kTensorArenaSize = 24 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_MEDIUM_INT8_MODEL)
+constexpr int kTensorArenaSize = 70 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
+constexpr int kTensorArenaSize = 115 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+constexpr int kTensorArenaSize = 42 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
+constexpr int kTensorArenaSize = 67 * 1024 + scratchBufSize;
+#else
+constexpr int kTensorArenaSize = 220 * 1024 + scratchBufSize;
+#endif
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 }  // namespace
 

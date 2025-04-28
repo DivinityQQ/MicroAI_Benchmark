@@ -67,12 +67,16 @@ TfLiteTensor* input = nullptr;
 // signed value.
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
-constexpr int scratchBufSize = 60 * 1024;
+constexpr int scratchBufSize = 0 * 1024;
 #else
 constexpr int scratchBufSize = 0;
 #endif
+#ifdef USE_8BIT_MODEL
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 20 * 1024 + scratchBufSize;
+constexpr int kTensorArenaSize = 12 * 1024 + scratchBufSize;
+#elif defined(USE_STANDARD_MODEL)
+constexpr int kTensorArenaSize = 17 * 1024 + scratchBufSize;
+#endif
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 }  // namespace
 

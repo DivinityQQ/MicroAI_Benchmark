@@ -59,6 +59,8 @@ const char* get_benchmark_type() {
       return "KWS_DS_CNN_SMALL_INT16";
     #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
       return "KWS_DS_CNN_SMALL_FLOAT32";
+    #elif defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
+      return "KWS_DS_CNN_MEDIUM_FLOAT32";
     #else
       return "KWS";
     #endif
