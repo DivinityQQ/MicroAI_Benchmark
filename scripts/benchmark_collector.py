@@ -5,9 +5,16 @@ import re
 import os
 import time
 import sys
+import json
 from datetime import datetime
 
-OUTPUT_DIR = "benchmark_results"  # Directory to store all CSVs
+# Main output directory
+OUTPUT_DIR = "benchmark_results"
+# Subdirectories for different file types
+CSV_DIR = os.path.join(OUTPUT_DIR, "csv")
+SUMMARY_DIR = os.path.join(OUTPUT_DIR, "summary")
+MEM_INFO_DIR = os.path.join(OUTPUT_DIR, "mem_info")
+
 BAUD_RATE = 115200
 RUNS_TO_SKIP = 4  # Skip the first 4 runs, collect the 5th
 
@@ -118,9 +125,10 @@ def print_flush(message):
 
 def main():
     try:
-        # Create output directory if it doesn't exist
-        if not os.path.exists(OUTPUT_DIR):
-            os.makedirs(OUTPUT_DIR)
+        # Create output directories if they don't exist
+        for directory in [OUTPUT_DIR, CSV_DIR, SUMMARY_DIR, MEM_INFO_DIR]:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
         
         # Check if environment name and port were passed as arguments
         if len(sys.argv) > 2:
@@ -151,6 +159,23 @@ def main():
             return
             
         print_flush("Connected to serial port. Waiting for benchmark data...")
+        
+        # Load memory usage data if available
+        memory_usage = {}
+        memory_file = os.path.join(MEM_INFO_DIR, f"memory_usage_{mcu_type}.json")
+        if os.path.exists(memory_file):
+            try:
+                with open(memory_file, 'r') as f:
+                    memory_usage = json.load(f)
+                    
+                print_flush(f"Loaded memory usage data from {memory_file}")
+                print_flush(f"RAM: {memory_usage['ram_used_bytes']}/{memory_usage['ram_total_bytes']} bytes ({memory_usage['ram_percentage']}%)")
+                print_flush(f"Flash: {memory_usage['flash_used_bytes']}/{memory_usage['flash_total_bytes']} bytes ({memory_usage['flash_percentage']}%)")
+            except Exception as e:
+                print_flush(f"Error loading memory usage data: {e}")
+        else:
+            print_flush(f"No memory usage data found at {memory_file}")
+            print_flush("Memory information will not be included in benchmark results")
         
         # Initialize data structures
         benchmark_data = {}
@@ -212,26 +237,29 @@ def main():
                         "board": mcu_type,
                         "benchmark_type": benchmark_type,
                         **operation_times,
-                        **memory_stats
+                        **memory_stats,
+                        **memory_usage  # Add the memory usage data
                     }
                     
                     # Create filename for this board/benchmark combination
                     safe_mcu = str(mcu_type).replace(" ", "_").replace("/", "_")
                     safe_benchmark = str(benchmark_type).replace(" ", "_").replace("/", "_")
-                    filename = f"{OUTPUT_DIR}/benchmark_{safe_mcu}_{safe_benchmark}.csv"
+                    
+                    # Create CSV filename in csv subfolder
+                    csv_filename = os.path.join(CSV_DIR, f"benchmark_{safe_mcu}_{safe_benchmark}.csv")
                     
                     # Check if file exists to determine if we need to write headers
-                    file_exists = os.path.isfile(filename)
+                    file_exists = os.path.isfile(csv_filename)
                     
                     # Write to CSV
-                    with open(filename, 'a', newline='') as csvfile:
+                    with open(csv_filename, 'a', newline='') as csvfile:
                         writer = csv.DictWriter(csvfile, fieldnames=list(benchmark_data.keys()))
                         if not file_exists:
                             writer.writeheader()
                         writer.writerow(benchmark_data)
                     
-                    # Create a human-readable summary file
-                    summary_filename = f"{OUTPUT_DIR}/summary_{safe_mcu}_{safe_benchmark}.txt"
+                    # Create a human-readable summary file in summary subfolder
+                    summary_filename = os.path.join(SUMMARY_DIR, f"summary_{safe_mcu}_{safe_benchmark}.txt")
                     with open(summary_filename, 'w') as f:
                         f.write(f"Benchmark Summary\n")
                         f.write(f"================\n\n")
@@ -264,8 +292,15 @@ def main():
                             readable_key = key.replace("_bytes", "")
                             readable_key = readable_key.replace("_", " ").upper()
                             f.write(f"{readable_key}: {value}\n")
+                        
+                        # Add firmware memory usage if memory_usage is not empty
+                        if memory_usage:
+                            f.write(f"\nFirmware Size Information:\n")
+                            f.write(f"-------------------------\n")
+                            f.write(f"RAM Usage: {memory_usage['ram_used_bytes']:,} / {memory_usage['ram_total_bytes']:,} bytes ({memory_usage['ram_percentage']}%)\n")
+                            f.write(f"Flash Usage: {memory_usage['flash_used_bytes']:,} / {memory_usage['flash_total_bytes']:,} bytes ({memory_usage['flash_percentage']}%)\n")
                     
-                    print_flush(f"Benchmark data saved to {filename}")
+                    print_flush(f"Benchmark data saved to {csv_filename}")
                     print_flush(f"Human-readable summary saved to {summary_filename}")
                     
                     # Mark this benchmark as completed
