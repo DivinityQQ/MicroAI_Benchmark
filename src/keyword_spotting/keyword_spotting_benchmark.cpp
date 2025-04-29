@@ -63,12 +63,16 @@ limitations under the License.
 #include "ds_cnn_m_quantized_model_data.h"
 #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
 #include "ds_cnn_l_quantized_model_data.h"
-#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
-#include "ds_cnn_s_quantized_int16_model_data.h"
 #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
 #include "ds_cnn_s_model_data.h"
-#else
+#elif defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
 #include "ds_cnn_m_model_data.h"
+#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+#include "ds_cnn_s_quantized_int16_model_data.h"
+#elif defined(USE_MICRONET_SMALL_INT8_MODEL)
+#include "kws_micronet_s_model_data.h"
+#elif defined(USE_MICRONET_MEDIUM_INT8_MODEL)
+#include "kws_micronet_m_model_data.h"
 #endif
 
 #include "common/benchmark_utils.h"
@@ -121,12 +125,18 @@ TfLiteTensor* input = nullptr;
   constexpr int scratchBufSize = 100 * 1024;
   #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
   constexpr int scratchBufSize = 160 * 1024;
-  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
-  constexpr int scratchBufSize = 2 * 1024;
   #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
   constexpr int scratchBufSize = 4 * 1024;
-  #else
+  #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
   constexpr int scratchBufSize = 12 * 1024;
+  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+  constexpr int scratchBufSize = 2 * 1024;
+  #elif defined(USE_MICRONET_SMALL_INT8_MODEL)
+  constexpr int scratchBufSize = 45 * 1024;
+  #elif defined(USE_MICRONET_MEDIUM_INT8_MODEL)
+  constexpr int scratchBufSize = 74 * 1024;
+  #else
+  constexpr int scratchBufSize = 100 * 1024;
   #endif
 #else
 constexpr int scratchBufSize = 0;
@@ -158,12 +168,18 @@ constexpr int kTensorArenaSize = 24 * 1024 + scratchBufSize;
 constexpr int kTensorArenaSize = 70 * 1024 + scratchBufSize;
 #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
 constexpr int kTensorArenaSize = 115 * 1024 + scratchBufSize;
-#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
-constexpr int kTensorArenaSize = 42 * 1024 + scratchBufSize;
 #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
 constexpr int kTensorArenaSize = 67 * 1024 + scratchBufSize;
-#else
+#elif defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
 constexpr int kTensorArenaSize = 220 * 1024 + scratchBufSize;
+#elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+constexpr int kTensorArenaSize = 42 * 1024 + scratchBufSize;
+#elif defined(USE_MICRONET_SMALL_INT8_MODEL)
+constexpr int kTensorArenaSize = 64 * 1024 + scratchBufSize;
+#elif defined(USE_MICRONET_MEDIUM_INT8_MODEL)
+constexpr int kTensorArenaSize = 102 * 1024 + scratchBufSize;
+#else
+constexpr int kTensorArenaSize = 100 * 1024 + scratchBufSize;
 #endif
 alignas(16) uint8_t tensor_arena[kTensorArenaSize]; // Maybe we should move this to external
 }  // namespace
@@ -228,12 +244,16 @@ void keyword_spotting_setup() {
   model = tflite::GetModel(g_ds_cnn_m_quantized_model_data);
   #elif defined(USE_DS_CNN_LARGE_INT8_MODEL)
   model = tflite::GetModel(g_ds_cnn_l_quantized_model_data);
-  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
-  model = tflite::GetModel(g_ds_cnn_s_quantized_int16_model_data);
   #elif defined(USE_DS_CNN_SMALL_FLOAT32_MODEL)
   model = tflite::GetModel(g_ds_cnn_s_model_data);
-  #else
+  #elif defined(USE_DS_CNN_MEDIUM_FLOAT32_MODEL)
   model = tflite::GetModel(g_ds_cnn_m_model_data);
+  #elif defined(USE_DS_CNN_SMALL_INT16_MODEL)
+  model = tflite::GetModel(g_ds_cnn_s_quantized_int16_model_data);
+  #elif defined(USE_MICRONET_SMALL_INT8_MODEL)
+  model = tflite::GetModel(g_kws_micronet_s_model_data);
+  #elif defined(USE_MICRONET_MEDIUM_INT8_MODEL)
+  model = tflite::GetModel(g_kws_micronet_m_model_data);
   #endif
   
   if (model->version() != TFLITE_SCHEMA_VERSION) {
