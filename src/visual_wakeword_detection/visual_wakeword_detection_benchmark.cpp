@@ -70,7 +70,7 @@ TfLiteTensor* input = nullptr;
   #ifdef USE_128x128x1_MODEL
     constexpr int scratchBufSize = 75 * 1024;
   #else
-    constexpr int scratchBufSize = 2 * 1024;
+    constexpr int scratchBufSize = 22 * 1024;
   #endif
 #else
   constexpr int scratchBufSize = 0;

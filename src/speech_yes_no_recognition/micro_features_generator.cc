@@ -50,7 +50,7 @@ tflite::MicroInterpreter* interpreter = nullptr;
 #endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
-constexpr int scratchBufSize = 0 * 1024;
+constexpr int scratchBufSize = 4 * 1024;
 #else
 constexpr int scratchBufSize = 0;
 #endif
