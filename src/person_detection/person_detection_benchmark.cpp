@@ -81,7 +81,7 @@ void person_detection_setup() {
 
   // Enable serial only when profiling is enabled and you intend to connect the kit to PC,
   // on some boards it might hang otherwise
-  #if defined(ENABLE_PROFILING) || defined(ENABLE_LOGGING)
+  #if defined(ENABLE_PROFILING) || defined(ENABLE_LOGGING) || defined(ARDUINO_ARCH_STM32)
   Serial.begin(115200);
   while(!Serial);
   #endif
