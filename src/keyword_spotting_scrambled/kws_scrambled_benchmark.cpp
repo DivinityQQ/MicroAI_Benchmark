@@ -106,6 +106,15 @@ void kws_scrambled_setup() {
   digitalWrite(32+1, HIGH);
   #endif
 
+  #ifdef ARDUINO_RASPBERRY_PI_PICO_2
+  // digitalWrite(PIN_LED, HIGH);
+
+  // Put the SMPS into PWM mode for better power consumption readibility
+  // at the cost of higher idle power consumption
+  pinMode(23, OUTPUT);
+  digitalWrite(23, HIGH);
+  #endif
+  
   // Set up logging. Google style is to avoid globals or statics because of
   // lifetime uncertainty, but since this has a trivial destructor it's okay.
   // NOLINTNEXTLINE(runtime-global-variables)

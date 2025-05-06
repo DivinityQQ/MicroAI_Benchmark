@@ -97,23 +97,16 @@ void noise_reduction_setup() {
   // at the cost of higher idle power consumption
   digitalWrite(32+1, HIGH);
   #endif
-  
-  #ifdef CONFIG_IDF_TARGET_ESP32C6
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
 
-  // turn the LED off by making the voltage LOW
-  digitalWrite(LED_BUILTIN, LOW);
-  #endif
-
-  #ifdef ARDUINO_RASPBERRY_PI_PICO_W
+  #ifdef ARDUINO_RASPBERRY_PI_PICO_2
   // digitalWrite(PIN_LED, HIGH);
 
   // Put the SMPS into PWM mode for better power consumption readibility
   // at the cost of higher idle power consumption
-  digitalWrite(32+1, HIGH);
+  pinMode(23, OUTPUT);
+  digitalWrite(23, HIGH);
   #endif
-
+  
   // Set up logging. Google style is to avoid globals or statics because of
   // lifetime uncertainty, but since this has a trivial destructor it's okay.
   // NOLINTNEXTLINE(runtime-global-variables)
