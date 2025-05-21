@@ -137,10 +137,6 @@ Results are stored in the `benchmark_results` directory. The framework measures:
 - `tflm_headers/`: TensorFlow Lite Micro headers
 - `scripts/`: Benchmark collection and analysis scripts
 
-## License
-
-This project is licensed under the Apache 2.0 License. 
-
 ## Credits
 
 This project uses slightly modified library [tflite-micro-arduino-examples](https://github.com/Gostas/tflite-micro-arduino-examples) for TFLM with CMSIS-NN optimized kernels and [ESP_TF](https://github.com/Nickjgniklu/ESP_TF) `create.sh` script for TFLM with esp-nn kernels.

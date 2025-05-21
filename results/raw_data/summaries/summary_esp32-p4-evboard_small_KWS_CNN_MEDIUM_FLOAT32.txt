@@ -1,0 +1,33 @@
+Benchmark Summary
+================
+
+Board: esp32-p4-evboard_small
+Benchmark: KWS_CNN_MEDIUM_FLOAT32
+Timestamp: 2025-05-02T16:54:46.250701
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 3455306
+CONV_2D: 3447223
+FULLY_CONNECTED: 7864
+RESHAPE: 86
+SOFTMAX: 96
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 86232
+ARENA HEAD: 83968
+ARENA TAIL: 2264
+FLASH TOTAL: 1310720
+FLASH USED: 1103397
+NODEANDREGISTRATION STRUCT: 256
+PERSISTENT BUFFER DATA: 1260
+PERSISTENT TFLITETENSOR DATA: 80
+RAM TOTAL: 512000
+RAM USED: 100368
+TFLITEEVALTENSOR DATA: 252
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 100,368 / 512,000 bytes (19.6%)
+Flash Usage: 1,103,397 / 1,310,720 bytes (84.2%)

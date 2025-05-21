@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_tflitetensor_quantization_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-02T18:19:41.481498,nano33ble_fast,KWS_DNN_LARGE_INT8,28170,27998,106,2004,896,1108,168,64,40,416,160,90664,262144,34.6,696144,983040,70.8

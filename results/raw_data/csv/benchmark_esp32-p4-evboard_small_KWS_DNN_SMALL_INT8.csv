@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_tflitetensor_quantization_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-02T16:57:09.757399,esp32-p4-evboard_small,KWS_DNN_SMALL_INT8,2804,2784,14,1468,432,1036,168,80,40,280,160,70816,512000,13.8,469681,1310720,35.8

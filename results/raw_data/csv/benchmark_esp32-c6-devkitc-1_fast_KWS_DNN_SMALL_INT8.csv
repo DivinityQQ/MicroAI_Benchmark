@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_tflitetensor_quantization_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-02T16:27:22.277994,esp32-c6-devkitc-1_fast,KWS_DNN_SMALL_INT8,5715,5509,161,1580,432,1148,168,80,40,396,160,61212,327680,18.7,470163,1310720,35.9

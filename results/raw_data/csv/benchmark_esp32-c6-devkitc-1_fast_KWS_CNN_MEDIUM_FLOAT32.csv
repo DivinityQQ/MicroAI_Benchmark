@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,reshape_ticks,conv_2d_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-02T16:24:11.537628,esp32-c6-devkitc-1_fast,KWS_CNN_MEDIUM_FLOAT32,5176370,106,5140071,35940,197,85432,83968,1464,252,80,460,256,146204,327680,44.6,1103877,1310720,84.2

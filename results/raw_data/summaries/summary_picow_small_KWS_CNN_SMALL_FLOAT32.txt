@@ -1,0 +1,33 @@
+Benchmark Summary
+================
+
+Board: picow_small
+Benchmark: KWS_CNN_SMALL_FLOAT32
+Timestamp: 2025-05-02T11:17:15.370541
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 5579613
+CONV_2D: 5522778
+FULLY_CONNECTED: 56470
+RESHAPE: 128
+SOFTMAX: 141
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 40464
+ARENA HEAD: 39040
+ARENA TAIL: 1424
+FLASH TOTAL: 2093056
+FLASH USED: 688140
+NODEANDREGISTRATION STRUCT: 256
+PERSISTENT BUFFER DATA: 468
+PERSISTENT TFLITETENSOR DATA: 64
+RAM TOTAL: 262144
+RAM USED: 156216
+TFLITEEVALTENSOR DATA: 252
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 156,216 / 262,144 bytes (59.6%)
+Flash Usage: 688,140 / 2,093,056 bytes (32.9%)

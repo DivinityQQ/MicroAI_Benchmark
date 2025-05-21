@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,reshape_ticks,conv_2d_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-03T11:31:48.774687,teensy40_small,KWS_CNN_MEDIUM_FLOAT32,503837,77,500676,3077,5,85392,83968,1424,252,64,468,256,261056,1048576,24.9,822268,2031616,40.5

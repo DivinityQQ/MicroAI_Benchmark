@@ -1,0 +1,32 @@
+Benchmark Summary
+================
+
+Board: nano33ble_small
+Benchmark: KWS_DNN_MEDIUM_INT8
+Timestamp: 2025-05-02T17:43:21.324977
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 19091
+FULLY_CONNECTED: 18952
+SOFTMAX: 71
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 1620
+ARENA HEAD: 512
+ARENA TAIL: 1108
+FLASH TOTAL: 983040
+FLASH USED: 368592
+NODEANDREGISTRATION STRUCT: 160
+PERSISTENT BUFFER DATA: 416
+PERSISTENT TFLITETENSOR DATA: 64
+PERSISTENT TFLITETENSOR QUANTIZATION DATA: 40
+RAM TOTAL: 262144
+RAM USED: 89640
+TFLITEEVALTENSOR DATA: 168
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 89,640 / 262,144 bytes (34.2%)
+Flash Usage: 368,592 / 983,040 bytes (37.5%)

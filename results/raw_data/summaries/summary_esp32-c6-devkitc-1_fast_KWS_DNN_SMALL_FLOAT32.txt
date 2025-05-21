@@ -1,0 +1,31 @@
+Benchmark Summary
+================
+
+Board: esp32-c6-devkitc-1_fast
+Benchmark: KWS_DNN_SMALL_FLOAT32
+Timestamp: 2025-05-02T16:29:54.221490
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 47832
+FULLY_CONNECTED: 47582
+SOFTMAX: 196
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 2840
+ARENA HEAD: 1728
+ARENA TAIL: 1112
+FLASH TOTAL: 1310720
+FLASH USED: 707265
+NODEANDREGISTRATION STRUCT: 160
+PERSISTENT BUFFER DATA: 400
+PERSISTENT TFLITETENSOR DATA: 80
+RAM TOTAL: 327680
+RAM USED: 62236
+TFLITEEVALTENSOR DATA: 168
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 62,236 / 327,680 bytes (19.0%)
+Flash Usage: 707,265 / 1,310,720 bytes (54.0%)

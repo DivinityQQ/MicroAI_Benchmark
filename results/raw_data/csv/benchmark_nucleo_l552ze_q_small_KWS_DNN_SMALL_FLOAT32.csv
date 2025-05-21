@@ -1,0 +1,2 @@
+timestamp,board,benchmark_type,total_execution_time_ticks,fully_connected_ticks,softmax_ticks,arena_total_bytes,arena_head_bytes,arena_tail_bytes,tfliteevaltensor_data_bytes,persistent_tflitetensor_data_bytes,persistent_buffer_data_bytes,nodeandregistration_struct_bytes,ram_used_bytes,ram_total_bytes,ram_percentage,flash_used_bytes,flash_total_bytes,flash_percentage
+2025-05-03T09:56:08.474477,nucleo_l552ze_q_small,KWS_DNN_SMALL_FLOAT32,7324,7259,45,2800,1728,1072,168,64,420,160,49572,196608,25.2,429148,524288,81.9

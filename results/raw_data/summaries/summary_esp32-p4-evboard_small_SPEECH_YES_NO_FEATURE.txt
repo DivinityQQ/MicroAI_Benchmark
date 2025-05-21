@@ -1,0 +1,39 @@
+Benchmark Summary
+================
+
+Board: esp32-p4-evboard_small
+Benchmark: SPEECH_YES_NO_FEATURE
+Timestamp: 2025-05-02T16:49:36.908668
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 26137
+ADD: 788
+CAST: 899
+CONCATENATION: 380
+DIV: 1001
+MAXIMUM: 891
+MINIMUM: 918
+MUL: 727
+PCAN: 799
+RESHAPE: 177
+STRIDED_SLICE: 349
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 8600
+ARENA HEAD: 3040
+ARENA TAIL: 5560
+FLASH TOTAL: 1310720
+FLASH USED: 597837
+NODEANDREGISTRATION STRUCT: 704
+PERSISTENT BUFFER DATA: 3896
+PERSISTENT TFLITETENSOR DATA: 80
+RAM TOTAL: 512000
+RAM USED: 97484
+TFLITEEVALTENSOR DATA: 516
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 97,484 / 512,000 bytes (19.0%)
+Flash Usage: 597,837 / 1,310,720 bytes (45.6%)

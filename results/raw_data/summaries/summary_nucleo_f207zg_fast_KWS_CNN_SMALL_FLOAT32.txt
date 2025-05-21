@@ -1,0 +1,33 @@
+Benchmark Summary
+================
+
+Board: nucleo_f207zg_fast
+Benchmark: KWS_CNN_SMALL_FLOAT32
+Timestamp: 2025-05-02T19:47:13.904076
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 1781614
+CONV_2D: 1756979
+FULLY_CONNECTED: 23861
+RESHAPE: 572
+SOFTMAX: 188
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 40464
+ARENA HEAD: 39040
+ARENA TAIL: 1424
+FLASH TOTAL: 1048576
+FLASH USED: 388420
+NODEANDREGISTRATION STRUCT: 256
+PERSISTENT BUFFER DATA: 468
+PERSISTENT TFLITETENSOR DATA: 64
+RAM TOTAL: 131072
+RAM USED: 87372
+TFLITEEVALTENSOR DATA: 252
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 87,372 / 131,072 bytes (66.7%)
+Flash Usage: 388,420 / 1,048,576 bytes (37.0%)

@@ -1,0 +1,33 @@
+Benchmark Summary
+================
+
+Board: esp32dev_small
+Benchmark: KWS_CNN_SMALL_FLOAT32
+Timestamp: 2025-04-29T12:08:11.614901
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 1290992
+CONV_2D: 1271092
+FULLY_CONNECTED: 19328
+RESHAPE: 194
+SOFTMAX: 209
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 40504
+ARENA HEAD: 39040
+ARENA TAIL: 1464
+FLASH TOTAL: 1310720
+FLASH USED: 652177
+NODEANDREGISTRATION STRUCT: 256
+PERSISTENT BUFFER DATA: 460
+PERSISTENT TFLITETENSOR DATA: 80
+RAM TOTAL: 327680
+RAM USED: 69184
+TFLITEEVALTENSOR DATA: 252
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 69,184 / 327,680 bytes (21.1%)
+Flash Usage: 652,177 / 1,310,720 bytes (49.8%)

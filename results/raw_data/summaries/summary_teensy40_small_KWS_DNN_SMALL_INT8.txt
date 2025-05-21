@@ -1,0 +1,32 @@
+Benchmark Summary
+================
+
+Board: teensy40_small
+Benchmark: KWS_DNN_SMALL_INT8
+Timestamp: 2025-05-03T11:39:39.901978
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 415
+FULLY_CONNECTED: 408
+SOFTMAX: 6
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 1540
+ARENA HEAD: 432
+ARENA TAIL: 1108
+FLASH TOTAL: 2031616
+FLASH USED: 189436
+NODEANDREGISTRATION STRUCT: 160
+PERSISTENT BUFFER DATA: 416
+PERSISTENT TFLITETENSOR DATA: 64
+PERSISTENT TFLITETENSOR QUANTIZATION DATA: 40
+RAM TOTAL: 1048576
+RAM USED: 260032
+TFLITEEVALTENSOR DATA: 168
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 260,032 / 1,048,576 bytes (24.8%)
+Flash Usage: 189,436 / 2,031,616 bytes (9.3%)

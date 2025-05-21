@@ -1,0 +1,32 @@
+Benchmark Summary
+================
+
+Board: pico2_fast
+Benchmark: KWS_DNN_SMALL_INT8
+Timestamp: 2025-05-05T20:43:13.289019
+
+Execution Times (ticks):
+----------------------
+TOTAL_EXECUTION_TIME: 10765
+FULLY_CONNECTED: 10541
+SOFTMAX: 171
+
+Memory Usage (bytes):
+-------------------
+ARENA TOTAL: 1540
+ARENA HEAD: 432
+ARENA TAIL: 1108
+FLASH TOTAL: 4190208
+FLASH USED: 261772
+NODEANDREGISTRATION STRUCT: 160
+PERSISTENT BUFFER DATA: 416
+PERSISTENT TFLITETENSOR DATA: 64
+PERSISTENT TFLITETENSOR QUANTIZATION DATA: 40
+RAM TOTAL: 524288
+RAM USED: 58276
+TFLITEEVALTENSOR DATA: 168
+
+Firmware Size Information:
+-------------------------
+RAM Usage: 58,276 / 524,288 bytes (11.1%)
+Flash Usage: 261,772 / 4,190,208 bytes (6.2%)
